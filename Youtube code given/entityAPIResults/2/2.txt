@@ -1,0 +1,8 @@
+Name: National Basketball Association	Id: National Basketball Association	Url: https://en.wikipedia.org/wiki/National_Basketball_Association
+	Data Source: Wikipedia
+Matches:
+	Text:NBA	Confidence Score: 0.19 
+Name: Sauce	Id: Sauce	Url: https://en.wikipedia.org/wiki/Sauce
+	Data Source: Wikipedia
+Matches:
+	Text:sauce	Confidence Score: 0.25 

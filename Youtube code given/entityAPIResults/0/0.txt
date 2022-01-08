@@ -1,0 +1,21 @@
+Name: American League	Id: American League	Url: https://en.wikipedia.org/wiki/American_League
+	Data Source: Wikipedia
+Matches:
+	Text:American League	Confidence Score: 0.87 
+Name: Major League Baseball	Id: Major League Baseball	Url: https://en.wikipedia.org/wiki/Major_League_Baseball
+	Data Source: Wikipedia
+Matches:
+	Text:Major League	Confidence Score: 0.47 
+	Text:Baseball	Confidence Score: 0.06 
+Name: Universal Pictures	Id: Universal Pictures	Url: https://en.wikipedia.org/wiki/Universal_Pictures
+	Data Source: Wikipedia
+Matches:
+	Text:Universal	Confidence Score: 0.00 
+Name: United States	Id: United States	Url: https://en.wikipedia.org/wiki/United_States
+	Data Source: Wikipedia
+Matches:
+	Text:Union	Confidence Score: 0.24 
+Name: PH	Id: PH	Url: https://en.wikipedia.org/wiki/PH
+	Data Source: Wikipedia
+Matches:
+	Text:pH	Confidence Score: 0.04 

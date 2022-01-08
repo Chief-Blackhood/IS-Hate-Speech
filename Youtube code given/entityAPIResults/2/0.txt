@@ -1,0 +1,26 @@
+Name: Walt Disney World	Id: Walt Disney World	Url: https://en.wikipedia.org/wiki/Walt_Disney_World
+	Data Source: Wikipedia
+Matches:
+	Text:Walt Disney World Resort	Confidence Score: 0.83 
+	Text:Disney	Confidence Score: 0.83 
+Name: The Washington Post	Id: The Washington Post	Url: https://en.wikipedia.org/wiki/The_Washington_Post
+	Data Source: Wikipedia
+Matches:
+	Text:Washington Post	Confidence Score: 0.10 
+Name: World (magazine)	Id: World (magazine)	Url: https://en.wikipedia.org/wiki/World_(magazine)
+	Data Source: Wikipedia
+Matches:
+	Text:World	Confidence Score: 0.05 
+Name: Bend, Oregon	Id: Bend, Oregon	Url: https://en.wikipedia.org/wiki/Bend,_Oregon
+	Data Source: Wikipedia
+Matches:
+	Text:Bend	Confidence Score: 0.19 
+Name: National Basketball Association	Id: National Basketball Association	Url: https://en.wikipedia.org/wiki/National_Basketball_Association
+	Data Source: Wikipedia
+Matches:
+	Text:NBA	Confidence Score: 0.28 
+	Text:NBA	Confidence Score: 0.28 
+Name: The New York Times	Id: The New York Times	Url: https://en.wikipedia.org/wiki/The_New_York_Times
+	Data Source: Wikipedia
+Matches:
+	Text:The	Confidence Score: 0.15 

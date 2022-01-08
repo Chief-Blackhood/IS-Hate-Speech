@@ -1,0 +1,4 @@
+Name: Bucky (Marvel Comics)	Id: Bucky (Marvel Comics)	Url: https://en.wikipedia.org/wiki/Bucky_(Marvel_Comics)
+	Data Source: Wikipedia
+Matches:
+	Text:Bucky	Confidence Score: 0.02 

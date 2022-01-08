@@ -1,0 +1,22 @@
+sudo apt update
+sudo apt install ffmpeg
+pip install pysrt
+pip install selenium
+pip install youtube_dl
+pip install azure-ai-textanalytics
+
+#Downloading raw videos, transcripts and video data
+python get_vid_data.py 20
+python download_videos.py 2>&1 >download_videos.txt
+
+#Cleaning the file names and converting them into usable formats
+python change_video_names.py videos
+python vtt2srt.py transcripts vid_name_mapping.npy
+
+#Shot detection and Shot Wise transcript.
+mkdir shots
+python get_shots.py videos shots
+mkdir per_shot_transcripts
+python per_shot_transcript.py transcripts shots per_shot_transcripts
+mkdir entityAPIResults 
+python entity_linking.py per_shot_transcripts entityAPIResults

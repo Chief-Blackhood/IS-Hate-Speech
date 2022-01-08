@@ -1,0 +1,12 @@
+Name: American League	Id: American League	Url: https://en.wikipedia.org/wiki/American_League
+	Data Source: Wikipedia
+Matches:
+	Text:American League	Confidence Score: 0.92 
+Name: Station wagon	Id: Station wagon	Url: https://en.wikipedia.org/wiki/Station_wagon
+	Data Source: Wikipedia
+Matches:
+	Text:Universal	Confidence Score: 0.07 
+Name: PH	Id: PH	Url: https://en.wikipedia.org/wiki/PH
+	Data Source: Wikipedia
+Matches:
+	Text:pH	Confidence Score: 0.05 
