@@ -4,39 +4,51 @@ my_api_key = "AIzaSyCyegJgVEgui6-DZ56Ybg3trtC0UUjJvKQ"
 
 
 def fetch_comments_with_replies(video_id):
+ 
+    MAX_RESULTS=100
 
-    MAX_RESULTS = 100
-
-    base_url = f"https://youtube.googleapis.com/youtube/v3/commentThreads?part=id&part=replies&part=snippet&maxResults={MAX_RESULTS}&order=time&videoId={video_id}&key={my_api_key}"
-    final_ans = []
-    next_page_token = None
-
+    base_url=f'https://youtube.googleapis.com/youtube/v3/commentThreads?part=id&part=replies&part=snippet&maxResults={MAX_RESULTS}&order=time&videoId={video_id}&key={my_api_key}'
+    final_ans=[]
+    next_page_token=None
+    
     while True:
-        final_url = base_url
+        final_url=base_url
         if next_page_token is not None:
-            final_url += f"&pageToken={next_page_token}"
+            final_url+=f"&pageToken={next_page_token}"
         _res = requests.get(final_url, headers={"Accept": "application/json"})
         json = _res.json()
         final_json = []
-        if "items" in json:
-            for raw_comment in json["items"]:
-                top_comment = raw_comment["snippet"]["topLevelComment"]["snippet"]
-                top_comment.pop("videoId", None)
-                top_comment.pop("authorChannelId", None)
+        if 'items' in json:
+            for raw_comment in json['items']:
+                top_comment = raw_comment['snippet']['topLevelComment']['snippet']
+                top_comment['id'] = raw_comment['snippet']['topLevelComment']['id']
+                top_comment['totalReplyCount'] = raw_comment['snippet']['totalReplyCount']
+
+                to_remove = ['videoId', 'authorChannelId', 'authorChannelUrl', 'authorProfileImageUrl', 'canRate', 'viewerRating', 'publishedAt', 'updatedAt', 'textDisplay']
+                for feature in to_remove:
+                    top_comment.pop(feature, None)
+                
                 comment = {"top_comment": top_comment}
-                if "replies" in raw_comment:
-                    raw_replies = raw_comment["replies"]["comments"]
-                    replies = []
-                    for reply in raw_replies:
-                        rep = reply["snippet"]
-                        rep.pop("videoId", None)
-                        rep.pop("authorChannelId", None)
-                        replies.append(rep)
-                    comment["replies"] = replies
+                if 'replies' not in raw_comment:
+                    continue
+                if len(raw_comment['replies']['comments']) == top_comment['totalReplyCount']:
+                    raw_replies = raw_comment['replies']['comments']
+                else:
+                    comment_list_url = f'https://youtube.googleapis.com/youtube/v3/comments?part=snippet&part=id&maxResults=100&parentId={top_comment["id"]}&key={my_api_key}'
+                    replies_res = requests.get(comment_list_url, headers={"Accept": "application/json"})
+                    raw_replies = replies_res.json()['items']
+                replies = []
+                for reply in raw_replies:
+                    rep = reply['snippet']
+                    rep['id'] = reply['id']
+                    for feature in to_remove:
+                        rep.pop(feature, None)
+                    replies.append(rep)
+                comment['replies'] = replies
                 final_json.append(comment)
         final_ans.extend(final_json)
-        if "nextPageToken" in json.keys():
-            next_page_token = json["nextPageToken"]
+        if "nextPageToken"  in json.keys():
+            next_page_token=json["nextPageToken"]
         else:
             break
     return final_ans
@@ -63,7 +75,7 @@ def fetch_video_details(video_id):
 def get_youtube_data(URL):
 
     video_data = {"url": URL}
-    vid_id = URL.split("?v=")[1]
+    vid_id = URL.split("?v=")[1].split("&")[0]
 
     comments = fetch_comments_with_replies(vid_id)
     stats = fetch_video_details(vid_id)
