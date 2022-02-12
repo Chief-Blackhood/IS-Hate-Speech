@@ -4,6 +4,7 @@ import pandas as pd
 
 from bitchute import get_bitchute_data
 from youtube import get_youtube_data
+from tqdm import tqdm
 
 
 sheet_url = "https://docs.google.com/spreadsheets/d/16lxEwKVA_d_g5QRFNcBTyLz_OBPPB3wZdzZu2UnvLWQ/edit#gid=0"
@@ -36,8 +37,13 @@ youtube_urls = [
     url for url in urls if ("youtube" in url and url not in youtube_collected_urls)
 ]
 
-bitchute_meta_data.extend([get_bitchute_data(url) for url in bitchute_urls])
-youtube_meta_data.extend([get_youtube_data(url) for url in youtube_urls])
+new_data = []
+for url in tqdm(youtube_urls):
+    data = get_youtube_data(url)
+    if "stats" in data and "comments" in data:
+        new_data.append(data)
+bitchute_meta_data.extend([get_bitchute_data(url) for url in tqdm(bitchute_urls)])
+youtube_meta_data.extend(new_data)
 
 with open("bitchute_data.json", "w") as f:
     json.dump(bitchute_meta_data, f, indent=1)
