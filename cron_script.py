@@ -5,6 +5,7 @@ import pandas as pd
 from bitchute import get_bitchute_data
 from youtube import get_youtube_data
 from tqdm import tqdm
+from datetime import datetime
 
 
 sheet_url = "https://docs.google.com/spreadsheets/d/16lxEwKVA_d_g5QRFNcBTyLz_OBPPB3wZdzZu2UnvLWQ/edit#gid=0"
@@ -36,6 +37,7 @@ bitchute_urls = [
 youtube_urls = [
     url for url in urls if ("youtube" in url and url not in youtube_collected_urls)
 ]
+print(f"Date and time: {datetime.now()}")
 
 new_data = []
 for url in tqdm(youtube_urls):

@@ -68,7 +68,8 @@ def fetch_video_details(video_id):
     }
     for key, types in to_extract.items():
         for type in types:
-            final_data[type] = api_data[key][type]
+            if type in api_data[key]:
+                final_data[type] = api_data[key][type]
     return final_data
 
 
