@@ -1,8 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
-
+import time
 
 def get_bitchute_data(URL):
+    time.sleep(0.01)
     r = requests.get(URL)
     soup = BeautifulSoup(r.content, "html.parser")
     video_data = {"url": URL}
@@ -21,6 +22,7 @@ def get_bitchute_data(URL):
     }
 
     data = "csrfmiddlewaretoken=rINo5VQtVi97l3XNI8dMIa9O6rhl0n9TYVdgpIuoievjMfdE0YQ1lnrA7q57z9ng"
+    time.sleep(0.01)
     res = requests.post(f"{URL}counts/", data=data, headers=headers).json()
     video_data.update(res)
 
@@ -55,6 +57,7 @@ def get_bitchute_data(URL):
     }
     data = "cf_auth=eyJwcm9maWxlX2lkIjogImFub255bW91cyIsICJvd25lcl9pZCI6ICJmQjRBQWYxZnJoc00iLCAiZGlzcGxheV9uYW1lIjogImFub255bW91cyIsICJ0aHJlYWRfaWQiOiAiYmNfSWVoQTliTTNBUWwxIiwgImljb25fdXJsIjogIi9zdGF0aWMvdjEzNS9pbWFnZXMvYmxhbmstcHJvZmlsZS5wbmciLCAiY2ZfaXNfYWRtaW4iOiAiZmFsc2UifQ%3D%3D+8610c55261a3e3454e5cd41528c55e2e1a55f150761e6753a90b1ff4830366db+1641106687&commentCount=0&isNameValuesArrays=true"
 
+    time.sleep(0.01)
     comments = requests.post(
         "https://commentfreely.bitchute.com/api/get_comments/",
         data=data,

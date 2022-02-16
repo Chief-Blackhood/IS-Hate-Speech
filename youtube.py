@@ -1,4 +1,5 @@
 import requests
+import time
 
 my_api_key = "AIzaSyCyegJgVEgui6-DZ56Ybg3trtC0UUjJvKQ"
 
@@ -15,6 +16,7 @@ def fetch_comments_with_replies(video_id):
         final_url=base_url
         if next_page_token is not None:
             final_url+=f"&pageToken={next_page_token}"
+        time.sleep(0.01)
         _res = requests.get(final_url, headers={"Accept": "application/json"})
         json = _res.json()
         final_json = []
@@ -35,6 +37,7 @@ def fetch_comments_with_replies(video_id):
                     raw_replies = raw_comment['replies']['comments']
                 else:
                     comment_list_url = f'https://youtube.googleapis.com/youtube/v3/comments?part=snippet&part=id&maxResults=100&parentId={top_comment["id"]}&key={my_api_key}'
+                    time.sleep(0.01)
                     replies_res = requests.get(comment_list_url, headers={"Accept": "application/json"})
                     raw_replies = replies_res.json()['items']
                 replies = []
@@ -57,6 +60,7 @@ def fetch_comments_with_replies(video_id):
 def fetch_video_details(video_id):
     base_url = f"https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2C%20statistics&id={video_id}&key={my_api_key}"
     final_data = {}
+    time.sleep(0.01)
     _res = requests.get(base_url, headers={"Accept": "application/json"})
     json = _res.json()
     if "items" not in json:
