@@ -7,3 +7,5 @@ collect_data.*
 bitchute_videos/
 youtube_videos/
 python-client-generated
+wandb/
+*__pycache__*

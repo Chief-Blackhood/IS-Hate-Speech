@@ -22,7 +22,7 @@ def get_params():
     parser.add_argument("--test_question_file", default='data/with_aug/test.csv', type=str)
     parser.add_argument("--batch_size", default=16, type=int)
     parser.add_argument("--lr", default=0.001, type=float)
-    parser.add_argument("--num_workers", default=8, type=int)
+    parser.add_argument("--num_workers", default=4, type=int)
     parser.add_argument("--max_epochs", default=10, type=int)
     parser.add_argument("--max_len", default=512, type=int)
     parser.add_argument("--gpu", default='0', type=str)

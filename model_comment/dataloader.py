@@ -1,6 +1,5 @@
 import torch.utils.data as data
 import pandas as pd
-import os
 
 class HateSpeechData(data.Dataset):
 
@@ -8,9 +7,9 @@ class HateSpeechData(data.Dataset):
 
         self.args = args
         if phase == 'train':
-            self.comments = self.load_questions(os.path.join(args.work_dir, args.train_question_file))
+            self.comments = self.load_comments(args.train_question_file)
         else:
-            self.comments = self.load_questions(os.path.join(args.work_dir, args.test_question_file))
+            self.comments = self.load_comments(args.test_question_file)
 
     def load_comments(self, filename):
         df = pd.read_csv(filename)
