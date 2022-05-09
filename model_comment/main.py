@@ -73,7 +73,8 @@ def train_one_epoch(train_loader, epoch, phase):
     acces = AverageMeter()
     
     for itr, (comment, label) in enumerate(train_loader):
-        output = comment_model(comment)
+        input = ['[CLS] ' + c + ' [SEP]' for c in comment]
+        output = comment_model(lf_model.get_embeddings(input)[1])
         loss = criterion(output.to(device), label.to(device))        
         
         optimizer.zero_grad()
@@ -103,7 +104,8 @@ def eval_one_epoch(data_loader, epoch, phase):
     labels = []
     with torch.no_grad():
         for itr, (comment, label) in enumerate(train_loader):
-            output = comment_model(comment)
+            input = ['[CLS] ' + c + ' [SEP]' for c in comment]
+            output = comment_model(lf_model.get_embeddings(input)[1])
             loss = criterion(output.to(device), label.to(device))
 
             acc = accuracy(output, label)
@@ -155,7 +157,7 @@ for model in [lf_model.lf_model, comment_model]:
     params += list(model.parameters())
 
 optimizer = optim.Adam(params, lr = args.lr)
-scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=10, verbose=True)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, verbose=True)
 print('loaded models')
 
 if not os.path.exists(args.work_dir):
@@ -184,14 +186,14 @@ for epoch in range(args.max_epochs):
         'best_acc' : eval_acc,
         'monitor': 'eval_acc',
         'optimizer': optimizer.state_dict()
-    }, os.path.join(args.work_dir, 'lf_model_' + str(epoch)+'.pth.tar'))
+    }, os.path.join(args.work_dir, 'lf_model_' + str(epoch)+'.pth.tar'), is_better)
     save_checkpoint({ 'epoch': epoch ,
         'state_dict': comment_model.state_dict(),
         'best_loss': eval_loss,
         'best_acc' : eval_acc,
         'monitor': 'eval_acc',
         'vpm_optimizer': optimizer.state_dict()
-    }, os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar'))
+    }, os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar'), is_better)
     
     
 #load_weights('best')

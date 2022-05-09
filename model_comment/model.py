@@ -3,6 +3,8 @@ from torch import nn
 from transformers import LongformerModel, LongformerTokenizer
 from transformers import BertTokenizer, BertModel
 
+from .config import *
+
 
 class LFEmbeddingModule():
     def __init__(self, args, device):
@@ -32,7 +34,7 @@ class CommentModel(nn.Module):
     def __init__(self, args):
         super(CommentModel, self).__init__()
         self.fc = nn.Sequential(
-            nn.Linear(args.max_len, 1),
+            nn.Linear(FC, 1),
             nn.Sigmoid()
         )
 
