@@ -1,9 +1,9 @@
 import torch
 from torch import nn
-from transformers import LongformerModel, LongformerTokenizer
+# from transformers import LongformerModel, LongformerTokenizer
 from transformers import BertTokenizer, BertModel
 
-from .config import *
+from config import *
 
 
 class LFEmbeddingModule():

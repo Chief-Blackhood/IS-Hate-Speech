@@ -17,16 +17,16 @@ from model import LFEmbeddingModule, CommentModel
 
 def get_params():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--work_dir", default = 'model_comment/', type = str)
-    parser.add_argument("--train_question_file", default='data/with_aug/train.csv', type=str)
-    parser.add_argument("--test_question_file", default='data/with_aug/test.csv', type=str)
-    parser.add_argument("--batch_size", default=16, type=int)
-    parser.add_argument("--lr", default=0.001, type=float)
-    parser.add_argument("--num_workers", default=4, type=int)
-    parser.add_argument("--max_epochs", default=10, type=int)
-    parser.add_argument("--max_len", default=512, type=int)
-    parser.add_argument("--gpu", default='0', type=str)
-    parser.add_argument("--freeze_lf_layers", default=23, type=int)
+    parser.add_argument("--work_dir", default = 'model_comment/', type = str, help='location of all the train and model files located')
+    parser.add_argument("--train_question_file", default='data/with_aug/train.csv', type=str, help='train data')
+    parser.add_argument("--test_question_file", default='data/with_aug/test.csv', type=str, help='test data')
+    parser.add_argument("--batch_size", default=16, type=int, help='batch size')
+    parser.add_argument("--lr", default=0.001, type=float, help='learning rate')
+    parser.add_argument("--num_workers", default=4, type=int, help='number of workers')
+    parser.add_argument("--max_epochs", default=10, type=int, help='nummber of maximum epochs to run')
+    parser.add_argument("--max_len", default=512, type=int, help='max len of input')
+    parser.add_argument("--gpu", default='0', type=str, help='GPUs to use')
+    parser.add_argument("--freeze_lf_layers", default=23, type=int, help='number of layers to freeze in BERT or LF')
     
     return parser.parse_args()
     
@@ -133,8 +133,8 @@ def load_weights(epoch):
     return 
     
     
-run = wandb.init(project='hatespeech', entity='shrey2809')
 args = get_params()
+run = wandb.init(project='hatespeech', entity='shrey2809')
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 device = torch.device("cuda")
 print('number of available devices:', torch.cuda.device_count())
