@@ -10,3 +10,5 @@ python-client-generated
 wandb/
 *__pycache__*
 wandb_key
+*.zip
+cardiffnlp

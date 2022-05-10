@@ -1,7 +1,7 @@
 import requests
 import time
 
-my_api_key = "AIzaSyCyegJgVEgui6-DZ56Ybg3trtC0UUjJvKQ"
+my_api_key = "AIzaSyDMwd5_UXThkh4obbHSjju2BOKVnESF1rY"
 
 
 def fetch_comments_with_replies(video_id):
@@ -12,6 +12,7 @@ def fetch_comments_with_replies(video_id):
     final_ans=[]
     next_page_token=None
     
+    count = 0
     while True:
         final_url=base_url
         if next_page_token is not None:
@@ -22,6 +23,7 @@ def fetch_comments_with_replies(video_id):
         final_json = []
         if 'items' in json:
             for raw_comment in json['items']:
+                count +=1
                 top_comment = raw_comment['snippet']['topLevelComment']['snippet']
                 top_comment['id'] = raw_comment['snippet']['topLevelComment']['id']
                 top_comment['totalReplyCount'] = raw_comment['snippet']['totalReplyCount']
@@ -54,6 +56,8 @@ def fetch_comments_with_replies(video_id):
             next_page_token=json["nextPageToken"]
         else:
             break
+        if count > 5000:
+            break
     return final_ans
 
 
@@ -63,7 +67,7 @@ def fetch_video_details(video_id):
     time.sleep(0.01)
     _res = requests.get(base_url, headers={"Accept": "application/json"})
     json = _res.json()
-    if "items" not in json:
+    if "items" not in json or len(json["items"]) == 0:
         return final_data
     api_data = json["items"][0]
     to_extract = {
@@ -82,8 +86,18 @@ def get_youtube_data(URL):
     video_data = {"url": URL}
     vid_id = URL.split("?v=")[1].split("&")[0]
 
-    comments = fetch_comments_with_replies(vid_id)
-    stats = fetch_video_details(vid_id)
+    try:
+        comments = fetch_comments_with_replies(vid_id)
+        # print(comments)
+    except Exception as e:
+        print(e)
+        return video_data
+    
+    try:
+        stats = fetch_video_details(vid_id)
+    except Exception as e:
+        print(e)
+        return video_data
 
     if stats:
         video_data["stats"] = stats
