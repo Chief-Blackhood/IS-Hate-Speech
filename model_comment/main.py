@@ -49,7 +49,7 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 def accuracy(scores, labels):
-    pred = torch.argmax(scores, -1)
+    pred = torch.round(scores, -1)
     return torch.sum(pred == labels)/pred.shape[0]
 
 def save_checkpoint(state, filename='checkpoint.pth.tar', is_best=False):
@@ -71,10 +71,17 @@ def train_one_epoch(train_loader, epoch, phase):
     
     losses = AverageMeter()
     acces = AverageMeter()
+    threshold = torch.tensor([0.5]).cpu()
     
     for itr, (comment, label) in enumerate(train_loader):
         input = ['[CLS] ' + c + ' [SEP]' for c in comment]
         output = comment_model(lf_model.get_embeddings(input)[1])
+        output = output.cpu()
+        output = (output>threshold).float()*1
+        label = torch.reshape(label, (16, 1))
+        print(type(label[0]), label)
+        # output = torch.FloatTensor(output)
+        # label = torch.FloatTensor(label)
         loss = criterion(output.to(device), label.to(device))        
         
         optimizer.zero_grad()
@@ -99,6 +106,8 @@ def eval_one_epoch(data_loader, epoch, phase):
 
     losses = AverageMeter()
     acces = AverageMeter()
+    threshold = torch.tensor([0.5])
+    label_mapping = {"yes": 1., "no": 0.}
     
     preds = []
     labels = []
@@ -106,13 +115,18 @@ def eval_one_epoch(data_loader, epoch, phase):
         for itr, (comment, label) in enumerate(train_loader):
             input = ['[CLS] ' + c + ' [SEP]' for c in comment]
             output = comment_model(lf_model.get_embeddings(input)[1])
-            loss = criterion(output.to(device), label.to(device))
+            output = output.to(device)
+            output = (output>threshold).float()*1
+            label = [label_mapping[l] for l in label]
+            output = torch.FloatTensor(output)
+            label = torch.FloatTensor(label)
+            loss = criterion(output, label)
 
             acc = accuracy(output, label)
             losses.update(loss.data.item(), args.batch_size)
             acces.update(acc.item(), args.batch_size)
 
-            preds.extend(list(torch.argmax(output, -1).numpy()))
+            preds.extend(list(torch.round(output, -1).numpy()))
             labels.extend(list(label.numpy()))
         
             if itr % 25 == 0:
@@ -126,10 +140,10 @@ def eval_one_epoch(data_loader, epoch, phase):
 
 def load_weights(epoch):
     lf_checkpoint = os.path.join(args.work_dir, 'lf_model_' + str(epoch)+'.pth.tar')
-    commment_checkpoint = os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar')
+    comment_checkpoint = os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar')
     
     lf_model.lf_model.load_state_dict(torch.load(lf_checkpoint)['state_dict'])
-    comment_model.load_state_dict(torch.load(commment_checkpoint)['state_dict'])
+    comment_model.load_state_dict(torch.load(comment_checkpoint)['state_dict'])
     return 
     
     

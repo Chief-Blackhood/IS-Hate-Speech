@@ -13,7 +13,7 @@ class LFEmbeddingModule():
         self.lf_tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
         self.args = args
         self.device = device
-        modules = [self.lf_model.module.embeddings, *self.lf_model.module.encoder.layer[:self.args.freeze_lf_layers]]
+        modules = [self.lf_model.embeddings, *self.lf_model.encoder.layer[:self.args.freeze_lf_layers]]
         for module in modules:
             for param in module.parameters():
                 param.requires_grad = False
@@ -27,6 +27,9 @@ class LFEmbeddingModule():
             ind_c.extend((max_len - len(ind_c)) * [self.lf_tokenizer.pad_token_id])
             indexed_cs.append(ind_c)
         indexed_cs = torch.tensor(indexed_cs).to(self.device)
+        # with torch.no_grad():
+        #     last_hidden_states = self.lf_model(indexed_cs)[0] # Models outputs are now tuples
+        # embedding = last_hidden_states.mean(1)
         embedding = self.lf_model(indexed_cs)
         return embedding
     
