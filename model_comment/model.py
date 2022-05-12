@@ -27,9 +27,6 @@ class LFEmbeddingModule():
             ind_c.extend((max_len - len(ind_c)) * [self.lf_tokenizer.pad_token_id])
             indexed_cs.append(ind_c)
         indexed_cs = torch.tensor(indexed_cs).to(self.device)
-        # with torch.no_grad():
-        #     last_hidden_states = self.lf_model(indexed_cs)[0] # Models outputs are now tuples
-        # embedding = last_hidden_states.mean(1)
         embedding = self.lf_model(indexed_cs)
         return embedding
     

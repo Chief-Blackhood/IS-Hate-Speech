@@ -23,7 +23,7 @@ def get_params():
     parser.add_argument("--batch_size", default=16, type=int, help='batch size')
     parser.add_argument("--lr", default=0.001, type=float, help='learning rate')
     parser.add_argument("--num_workers", default=4, type=int, help='number of workers')
-    parser.add_argument("--max_epochs", default=10, type=int, help='nummber of maximum epochs to run')
+    parser.add_argument("--max_epochs", default=1, type=int, help='nummber of maximum epochs to run')
     parser.add_argument("--max_len", default=512, type=int, help='max len of input')
     parser.add_argument("--gpu", default='0', type=str, help='GPUs to use')
     parser.add_argument("--freeze_lf_layers", default=23, type=int, help='number of layers to freeze in BERT or LF')
@@ -48,9 +48,8 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 
-def accuracy(scores, labels):
-    pred = torch.round(scores, -1)
-    return torch.sum(pred == labels)/pred.shape[0]
+def accuracy(pred, labels):
+    return np.sum(pred == labels)/pred.shape[0]
 
 def save_checkpoint(state, filename='checkpoint.pth.tar', is_best=False):
     torch.save(state, filename)
@@ -71,26 +70,25 @@ def train_one_epoch(train_loader, epoch, phase):
     
     losses = AverageMeter()
     acces = AverageMeter()
-    threshold = torch.tensor([0.5]).cpu()
     
     for itr, (comment, label) in enumerate(train_loader):
+        label = label.to(device)
+
         input = ['[CLS] ' + c + ' [SEP]' for c in comment]
         output = comment_model(lf_model.get_embeddings(input)[1])
-        output = output.cpu()
-        output = (output>threshold).float()*1
-        label = torch.reshape(label, (16, 1))
-        print(type(label[0]), label)
-        # output = torch.FloatTensor(output)
-        # label = torch.FloatTensor(label)
-        loss = criterion(output.to(device), label.to(device))        
+
+        loss = criterion(output, label)        
         
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
+        output = np.round(output.detach().cpu().numpy())
+        label = np.round(label.detach().cpu().numpy())
         
         acc = accuracy(output, label)
         losses.update(loss.data.item(), args.batch_size)
-        acces.update(acc.item(), args.batch_size)
+        acces.update(acc, args.batch_size)
         
         if itr % 25 == 0:
             print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d}\t'
@@ -106,28 +104,28 @@ def eval_one_epoch(data_loader, epoch, phase):
 
     losses = AverageMeter()
     acces = AverageMeter()
-    threshold = torch.tensor([0.5])
-    label_mapping = {"yes": 1., "no": 0.}
     
     preds = []
     labels = []
     with torch.no_grad():
-        for itr, (comment, label) in enumerate(train_loader):
+        for itr, (comment, label) in enumerate(test_loader):
+            label = label.to(device)
+
             input = ['[CLS] ' + c + ' [SEP]' for c in comment]
             output = comment_model(lf_model.get_embeddings(input)[1])
-            output = output.to(device)
-            output = (output>threshold).float()*1
-            label = [label_mapping[l] for l in label]
-            output = torch.FloatTensor(output)
-            label = torch.FloatTensor(label)
+
             loss = criterion(output, label)
+
+            output = np.round(output.detach().cpu().numpy())
+            label = np.round(label.detach().cpu().numpy())
+        
 
             acc = accuracy(output, label)
             losses.update(loss.data.item(), args.batch_size)
-            acces.update(acc.item(), args.batch_size)
+            acces.update(acc, args.batch_size)
 
-            preds.extend(list(torch.round(output, -1).numpy()))
-            labels.extend(list(label.numpy()))
+            preds.extend(list(output))
+            labels.extend(list(label))
         
             if itr % 25 == 0:
                 print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d} \t'

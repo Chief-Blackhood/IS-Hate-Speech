@@ -1,3 +1,4 @@
+import torch
 import torch.utils.data as data
 import pandas as pd
 import numpy as np
@@ -7,7 +8,7 @@ class HateSpeechData(data.Dataset):
     def __init__(self, args, phase):
 
         self.args = args
-        self.label_mapping = {"yes": 1., "no": 0.}
+        # self.label_mapping = {"yes": 1., "no": 0.}
         if phase == 'train':
             self.comments = self.load_comments(args.train_question_file)
         else:
@@ -15,7 +16,7 @@ class HateSpeechData(data.Dataset):
 
     def load_comments(self, filename):
         df = pd.read_csv(filename)
-        df['label'] = df['label'].apply(lambda x: self.label_mapping[x])
+        df['label'] = df['label'].apply(lambda x: x == 'yes')
         return df
 
     def __len__(self):
@@ -24,4 +25,4 @@ class HateSpeechData(data.Dataset):
     def __getitem__(self, index):
         comment = self.comments['comment'][index]
         label = self.comments['label'][index]
-        return comment, np.float32(label)
+        return comment, torch.FloatTensor([label])
