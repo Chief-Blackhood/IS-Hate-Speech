@@ -20,13 +20,13 @@ def get_params():
     parser.add_argument("--work_dir", default = 'model_comment/', type = str, help='location of all the train and model files located')
     parser.add_argument("--train_question_file", default='data/with_aug/train.csv', type=str, help='train data')
     parser.add_argument("--test_question_file", default='data/with_aug/test.csv', type=str, help='test data')
-    parser.add_argument("--batch_size", default=16, type=int, help='batch size')
-    parser.add_argument("--lr", default=0.001, type=float, help='learning rate')
+    parser.add_argument("--batch_size", default=8, type=int, help='batch size')
+    parser.add_argument("--lr", default=0.0003, type=float, help='learning rate')
     parser.add_argument("--num_workers", default=4, type=int, help='number of workers')
     parser.add_argument("--max_epochs", default=1, type=int, help='nummber of maximum epochs to run')
     parser.add_argument("--max_len", default=512, type=int, help='max len of input')
     parser.add_argument("--gpu", default='0', type=str, help='GPUs to use')
-    parser.add_argument("--freeze_lf_layers", default=23, type=int, help='number of layers to freeze in BERT or LF')
+    parser.add_argument("--freeze_lf_layers", default=10, type=int, help='number of layers to freeze in BERT or LF')
     
     return parser.parse_args()
     
@@ -52,10 +52,11 @@ def accuracy(pred, labels):
     return np.sum(pred == labels)/pred.shape[0]
 
 def save_checkpoint(state, filename='checkpoint.pth.tar', is_best=False):
-    torch.save(state, filename)
+    # torch.save(state, filename)
     if is_best:
-        best_filename = 'best_lf_model.pth.tar' if 'lf_model' in filename else 'best_comment_model.pth.tar' 
-        shutil.copyfile(filename, best_filename)
+        best_filename = 'best_lf_model.pth.tar' if 'lf_model' in filename else 'best_comment_model.pth.tar'
+        torch.save(state, best_filename)
+        # shutil.copyfile(filename, best_filename)
         
 def get_data_loaders(args, phase):
     shuffle = True if phase == "train" else False
@@ -167,12 +168,12 @@ for model in [lf_model.lf_model, comment_model]:
     params += list(model.parameters())
 
 optimizer = optim.Adam(params, lr = args.lr)
-scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, verbose=True)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
 print('loaded models')
 
 if not os.path.exists(args.work_dir):
     os.mkdir(args.work_dir)
-
+ 
 best_eval_acc = 0
 train_acc = 0
 eval_acc = 0
@@ -204,7 +205,7 @@ for epoch in range(args.max_epochs):
         'monitor': 'eval_acc',
         'vpm_optimizer': optimizer.state_dict()
     }, os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar'), is_better)
-    
+   
     
 #load_weights('best')
 test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test')
