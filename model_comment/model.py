@@ -22,11 +22,8 @@ class LFEmbeddingModule():
     def get_embeddings(self, comments):
         indexed_cs = []
         max_len = self.args.max_len
-        for c in comments:
-            ind_c = self.lf_tokenizer.encode(c)[:max_len]
-            ind_c.extend((max_len - len(ind_c)) * [self.lf_tokenizer.pad_token_id])
-            indexed_cs.append(ind_c)
-        indexed_cs = torch.tensor(indexed_cs).to(self.device)
+        indexed_cs = self.lf_tokenizer.batch_encode_plus(comments, max_length=max_len,padding='max_length', truncation=True)
+        indexed_cs = torch.tensor(indexed_cs['input_ids']).to(self.device)
         embedding = self.lf_model(indexed_cs)
         return embedding
     

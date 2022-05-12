@@ -74,8 +74,7 @@ def train_one_epoch(train_loader, epoch, phase):
     for itr, (comment, label) in enumerate(train_loader):
         label = label.to(device)
 
-        input = ['[CLS] ' + c + ' [SEP]' for c in comment]
-        output = comment_model(lf_model.get_embeddings(input)[1])
+        output = comment_model(lf_model.get_embeddings(comment)[1])
 
         loss = criterion(output, label)        
         
@@ -111,8 +110,7 @@ def eval_one_epoch(data_loader, epoch, phase):
         for itr, (comment, label) in enumerate(test_loader):
             label = label.to(device)
 
-            input = ['[CLS] ' + c + ' [SEP]' for c in comment]
-            output = comment_model(lf_model.get_embeddings(input)[1])
+            output = comment_model(lf_model.get_embeddings(comment)[1])
 
             loss = criterion(output, label)
 

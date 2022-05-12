@@ -8,7 +8,6 @@ class HateSpeechData(data.Dataset):
     def __init__(self, args, phase):
 
         self.args = args
-        # self.label_mapping = {"yes": 1., "no": 0.}
         if phase == 'train':
             self.comments = self.load_comments(args.train_question_file)
         else:
