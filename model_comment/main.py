@@ -34,9 +34,9 @@ def get_params():
     parser.add_argument("--keyphrase_extract", default=True, type=bool, help="find key phrase in a doc before adding as context")
     parser.add_argument("--desc_word_limit", default=100, type=int, help="number of words to consider from video description")
     parser.add_argument("--key_phrase_count", default=20, type=int, help="number of key phrases to extract")
-    parser.add_argument("--use_mmr", default=True, type=bool, help="whether to use Maximal Marginal Relevance (MMR) for the selection of keywords/keyphrases")
+    parser.add_argument("--use_mmr", default=False, type=bool, help="whether to use Maximal Marginal Relevance (MMR) for the selection of keywords/keyphrases")
     parser.add_argument("--diversity", default=0.5, type=int, help="differnce between the key phrases extracted")
-    parser.add_argument("--keyphrase_ngram_range", default=(1, 1), type=Tuple[int, int], help="range of length, in words, of the extracted keywords/keyphrases")
+    parser.add_argument("----keyphrase_ngram_range", default=[1, 1], type=int, nargs='+', help="range of length, in words, of the extracted keywords/keyphrases")
     
     return parser.parse_args()
     
@@ -155,6 +155,7 @@ def load_weights(epoch):
     
     
 args = get_params()
+args.keyphrase_ngram_range = tuple(args.keyphrase_ngram_range)
 run = wandb.init(project='hatespeech', entity='shrey2809')
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 device = torch.device("cuda")
