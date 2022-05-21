@@ -1,6 +1,6 @@
 import torch
 import torch.utils.data as data
-import pandas as pdg
+import pandas as pd
 from keybert import KeyBERT
 
 class HateSpeechData(data.Dataset):
