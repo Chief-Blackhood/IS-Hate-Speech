@@ -21,7 +21,7 @@ class HateSpeechData(data.Dataset):
 
     def process_desc(self, text):
         doc = ' '.join(text.split()[:self.args.desc_word_limit])
-        keywords = self.kw_model.extract_keywords(doc, top_n=self.args.desc_word_limit, use_mmr=self.args.use_mmr,
+        keywords = self.kw_model.extract_keywords(doc, top_n=self.args.key_phrase_count, use_mmr=self.args.use_mmr,
                                              diversity=self.args.diversity, keyphrase_ngram_range=self.args.keyphrase_ngram_range)
         processed_desc = ' '.join([keyword[0] for keyword in keywords])
         return processed_desc
