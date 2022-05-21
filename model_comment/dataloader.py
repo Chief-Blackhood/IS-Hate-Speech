@@ -1,9 +1,6 @@
-from concurrent.futures import process
-from matplotlib.pyplot import title
 import torch
 import torch.utils.data as data
-import pandas as pd
-import numpy as np
+import pandas as pdg
 from keybert import KeyBERT
 
 class HateSpeechData(data.Dataset):
@@ -23,12 +20,10 @@ class HateSpeechData(data.Dataset):
             self.comments = pd.merge(self.comments, self.extra_context, how='left', on='url')
 
     def process_desc(self, text):
-        processed_desc = ''
         doc = ' '.join(text.split()[:self.args.desc_word_limit])
         keywords = self.kw_model.extract_keywords(doc, top_n=self.args.desc_word_limit, use_mmr=self.args.use_mmr,
                                              diversity=self.args.diversity, keyphrase_ngram_range=self.args.keyphrase_ngram_range)
-        for keyword in keywords:
-            processed_desc+=keyword[0]+' '
+        processed_desc = ' '.join([keyword[0] for keyword in keywords])
         return processed_desc
 
     def load_extra(self, filename):
@@ -46,7 +41,7 @@ class HateSpeechData(data.Dataset):
     def __getitem__(self, index):
         context = ''
         comment = self.comments['comment'][index]
-        context += '[CLS] '+comment
+        context += comment
         if self.args.add_title:
             title = self.comments['title'][index]
             context += ' [SEP] '+title
