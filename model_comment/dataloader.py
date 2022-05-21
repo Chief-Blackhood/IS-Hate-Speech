@@ -1,14 +1,14 @@
 import torch
 import torch.utils.data as data
 import pandas as pd
-from keybert import KeyBERT
+
 
 class HateSpeechData(data.Dataset):
 
-    def __init__(self, args, phase):
+    def __init__(self, args, phase, key_bert_model):
 
         self.args = args
-        self.kw_model = KeyBERT()
+        self.kw_model = key_bert_model
         if phase == 'train':
             self.comments = self.load_comments(args.train_question_file)
         else:

@@ -40,7 +40,7 @@ youtube_urls = [
 print(f"Date and time: {datetime.now()}")
 
 new_data = []
-for url in youtube_urls:
+for url in tqdm(youtube_urls[:50]):
     data = get_youtube_data(url)
     if "stats" in data and "comments" in data:
         new_data.append(data)
