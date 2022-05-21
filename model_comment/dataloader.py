@@ -16,8 +16,19 @@ class HateSpeechData(data.Dataset):
         if args.add_title or args.add_description:
             self.extra_context = self.load_extra(args.extra_data_path)
             if args.keyphrase_extract:
-                self.extra_context['desc'] = self.extra_context['desc'].apply(lambda x: self.process_desc(x))
+                self.extra_context['desc'] = self.extra_context['desc'].apply(lambda x: self.process_desc(self.preprocess(x)))
             self.comments = pd.merge(self.comments, self.extra_context, how='left', on='url')
+
+    def preprocess(self, text):
+        if text != text:
+            return ''
+        new_text = []
+    
+        for t in text.split(" "):
+            t = '@user' if t.startswith('@') and len(t) > 1 else t
+            t = 'http' if t.startswith('http') else t
+            new_text.append(t)
+        return " ".join(new_text)
 
     def process_desc(self, text):
         doc = ' '.join(text.split()[:self.args.desc_word_limit])

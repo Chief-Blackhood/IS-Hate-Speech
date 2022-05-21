@@ -34,6 +34,7 @@ def fetch_comments_with_replies(video_id):
                 
                 comment = {"top_comment": top_comment}
                 if 'replies' not in raw_comment:
+                    final_json.append(comment)
                     continue
                 if len(raw_comment['replies']['comments']) == top_comment['totalReplyCount']:
                     raw_replies = raw_comment['replies']['comments']
