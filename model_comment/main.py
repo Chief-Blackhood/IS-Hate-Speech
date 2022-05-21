@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader
 from torch import nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from typing import Tuple
 import wandb
 
 from dataloader import HateSpeechData
@@ -27,6 +28,15 @@ def get_params():
     parser.add_argument("--max_len", default=512, type=int, help='max len of input')
     parser.add_argument("--gpu", default='0', type=str, help='GPUs to use')
     parser.add_argument("--freeze_lf_layers", default=10, type=int, help='number of layers to freeze in BERT or LF')
+    parser.add_argument("--extra_data_path", default='data/extra_data.csv', type=str, help='extra context from a video')
+    parser.add_argument("--add_title", default=True, type=bool, help="add title as context")
+    parser.add_argument("--add_description", default=True, type=bool, help="add description as context")
+    parser.add_argument("--keyphrase_extract", default=True, type=bool, help="find key phrase in a doc before adding as context")
+    parser.add_argument("--desc_word_limit", default=100, type=int, help="number of words to consider from video description")
+    parser.add_argument("--key_phrase_count", default=20, type=int, help="number of key phrases to extract")
+    parser.add_argument("--use_mmr", default=True, type=bool, help="whether to use Maximal Marginal Relevance (MMR) for the selection of keywords/keyphrases")
+    parser.add_argument("--diversity", default=0.5, type=int, help="differnce between the key phrases extracted")
+    parser.add_argument("--keyphrase_ngram_range", default=(1, 1), type=Tuple[int, int], help="range of length, in words, of the extracted keywords/keyphrases")
     
     return parser.parse_args()
     

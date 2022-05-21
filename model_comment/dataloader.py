@@ -1,17 +1,39 @@
+from concurrent.futures import process
+from matplotlib.pyplot import title
 import torch
 import torch.utils.data as data
 import pandas as pd
 import numpy as np
+from keybert import KeyBERT
 
 class HateSpeechData(data.Dataset):
 
     def __init__(self, args, phase):
 
         self.args = args
+        self.kw_model = KeyBERT()
         if phase == 'train':
             self.comments = self.load_comments(args.train_question_file)
         else:
             self.comments = self.load_comments(args.test_question_file)
+        if args.add_title or args.add_description:
+            self.extra_context = self.load_extra(args.extra_data_path)
+            if args.keyphrase_extract:
+                self.extra_context['desc'] = self.extra_context['desc'].apply(lambda x: self.process_desc(x))
+            self.comments = pd.merge(self.comments, self.extra_context, how='left', on='url')
+
+    def process_desc(self, text):
+        processed_desc = ''
+        doc = ' '.join(text.split()[:self.args.desc_word_limit])
+        keywords = self.kw_model.extract_keywords(doc, top_n=self.args.desc_word_limit, use_mmr=self.args.use_mmr,
+                                             diversity=self.args.diversity, keyphrase_ngram_range=self.args.keyphrase_ngram_range)
+        for keyword in keywords:
+            processed_desc+=keyword[0]+' '
+        return processed_desc
+
+    def load_extra(self, filename):
+        df = pd.read_csv(filename)
+        return df
 
     def load_comments(self, filename):
         df = pd.read_csv(filename)
@@ -22,6 +44,14 @@ class HateSpeechData(data.Dataset):
         return len(self.comments)
 
     def __getitem__(self, index):
+        context = ''
         comment = self.comments['comment'][index]
+        context += '[CLS] '+comment
+        if self.args.add_title:
+            title = self.comments['title'][index]
+            context += ' [SEP] '+title
+        if self.args.add_description:
+            desc = self.comments['desc'][index]
+            context += ' [SEP] '+desc
         label = self.comments['label'][index]
-        return comment, torch.FloatTensor([label])
+        return context, torch.FloatTensor([label])
