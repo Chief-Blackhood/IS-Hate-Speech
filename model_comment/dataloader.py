@@ -13,11 +13,15 @@ class HateSpeechData(data.Dataset):
             self.comments = self.load_comments(args.train_question_file)
         else:
             self.comments = self.load_comments(args.test_question_file)
-        if args.add_title or args.add_description:
-            self.extra_context = self.load_extra(args.extra_data_path)
-            if args.keyphrase_extract:
-                self.extra_context['desc'] = self.extra_context['desc'].apply(lambda x: self.process_desc(self.preprocess(x)))
-            self.comments = pd.merge(self.comments, self.extra_context, how='left', on='url')
+        
+        # TODO: Add Transcripts to extra_data.csv
+        if args.add_title or args.add_description or args.add_transcription:
+            self.metadata = self.load_metadata(args.metadata_path)
+            if args.add_description:
+                self.metadata['desc'] = self.metadata['desc'].apply(lambda x: self.process_keyphrase_text(self.preprocess(x), args.desc_word_limit, args.desc_keyphrase_extract, args.desc_key_phrase_count))
+            if args.add_transcription:
+                self.metadata['transcript'] = self.metadata['transcript'].apply(lambda x: self.process_keyphrase_text(x, args.transcript_word_limit, args.transcript_keyphrase_extract, args.transcript_key_phrase_count))
+            self.comments = pd.merge(self.comments, self.metadata, how='left', on='url')
 
     def preprocess(self, text):
         if text != text:
@@ -30,14 +34,15 @@ class HateSpeechData(data.Dataset):
             new_text.append(t)
         return " ".join(new_text)
 
-    def process_desc(self, text):
-        doc = ' '.join(text.split()[:self.args.desc_word_limit])
-        keywords = self.kw_model.extract_keywords(doc, top_n=self.args.key_phrase_count, use_mmr=self.args.use_mmr,
-                                             diversity=self.args.diversity, keyphrase_ngram_range=self.args.keyphrase_ngram_range)
-        processed_desc = ' '.join([keyword[0] for keyword in keywords])
-        return processed_desc
+    def process_keyphrase_text(self, text, max_length, keyphrase_extract, key_phrase_count):
+        doc = ' '.join(text.split()[:max_length])
+        if keyphrase_extract:
+            keywords = self.kw_model.extract_keywords(doc, top_n=key_phrase_count, use_mmr=self.args.use_mmr,
+                                                    diversity=self.args.diversity, keyphrase_ngram_range=self.args.keyphrase_ngram_range)
+            doc = ' '.join([keyword[0] for keyword in keywords])
+        return doc
 
-    def load_extra(self, filename):
+    def load_metadata(self, filename):
         df = pd.read_csv(filename)
         return df
 
@@ -50,14 +55,12 @@ class HateSpeechData(data.Dataset):
         return len(self.comments)
 
     def __getitem__(self, index):
-        context = ''
-        comment = self.comments['comment'][index]
-        context += comment
+        context = self.comments['comment'][index]
         if self.args.add_title:
-            title = self.comments['title'][index]
-            context += ' [SEP] '+title
+            context += ' [SEP] ' + self.comments['title'][index]
         if self.args.add_description:
-            desc = self.comments['desc'][index]
-            context += ' [SEP] '+desc
+            context += ' [SEP] ' + self.comments['desc'][index]
+        if self.args.add_transcription:
+            context += ' [SEP] ' + self.comments['transcript'][index]
         label = self.comments['label'][index]
         return context, torch.FloatTensor([label])
