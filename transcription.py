@@ -10,12 +10,8 @@ import requests
 import time
 import swagger_client as cris_client
 
-logging.basicConfig(
-    stream=sys.stdout,
-    level=logging.DEBUG,
-    format="%(asctime)s %(message)s",
-    datefmt="%m/%d/%Y %I:%M:%S %p %Z",
-)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
+        format="%(asctime)s %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p %Z")
 
 # Your subscription key and region for the speech service
 SUBSCRIPTION_KEY = "79bc73af597546adb1f93e9e685563a0"
@@ -29,9 +25,7 @@ RECORDINGS_BLOB_URI = "<Your SAS Uri to the recording>"
 
 # Provide the uri of a container with audio files for transcribing all of them
 # with a single request. At least 'read' and 'list' (rl) permissions are required.
-# RECORDINGS_CONTAINER_URI = "https://hatespeechaudio.blob.core.windows.net/test?sp=racwdl&st=2022-03-04T12:01:31Z&se=2022-03-11T20:01:31Z&spr=https&sv=2020-08-04&sr=c&sig=c13ylgzOSxtG%2Bwi9YE%2FzIrP3faZA8nZRW26p072eepQ%3D"
-
-RECORDINGS_CONTAINER_URI = "https://hatespeechaudio.blob.core.windows.net/non-hate-audio?sp=racwdl&st=2022-04-03T15:20:20Z&se=2022-04-15T23:20:20Z&spr=https&sv=2020-08-04&sr=c&sig=i6frDBEZPuCX4mrCH931gFdZDQQYDUNl6XyS%2FavkBZ8%3D"
+RECORDINGS_CONTAINER_URI = "https://hatespeechaudio.blob.core.windows.net/bitchute?sp=racwdl&st=2022-05-22T10:14:47Z&se=2022-05-22T18:14:47Z&spr=https&sv=2020-08-04&sr=c&sig=u24hWIqD9xaHfBTKfYVSCeSk%2FulJ0LsEImhsJT8yHRY%3D"
 
 # Set model information when doing transcription with custom models
 MODEL_REFERENCE = None  # guid of a custom model
@@ -47,7 +41,7 @@ def transcribe_from_single_blob(uri, properties):
         description=DESCRIPTION,
         locale=LOCALE,
         content_urls=[uri],
-        properties=properties,
+        properties=properties
     )
 
     return transcription_definition
@@ -71,7 +65,7 @@ def transcribe_with_custom_model(api, uri, properties):
         locale=LOCALE,
         content_urls=[uri],
         model=model,
-        properties=properties,
+        properties=properties
     )
 
     return transcription_definition
@@ -87,7 +81,7 @@ def transcribe_from_container(uri, properties):
         description=DESCRIPTION,
         locale=LOCALE,
         content_container_url=uri,
-        properties=properties,
+        properties=properties
     )
 
     return transcription_definition
@@ -102,10 +96,9 @@ def _paginate(api, paginated_object):
     typename = type(paginated_object).__name__
     auth_settings = ["apiKeyHeader", "apiKeyQuery"]
     while paginated_object.next_link:
-        link = paginated_object.next_link[len(api.api_client.configuration.host) :]
-        paginated_object, status, headers = api.api_client.call_api(
-            link, "GET", response_type=typename, auth_settings=auth_settings
-        )
+        link = paginated_object.next_link[len(api.api_client.configuration.host):]
+        paginated_object, status, headers = api.api_client.call_api(link, "GET",
+            response_type=typename, auth_settings=auth_settings)
 
         if status == 200:
             yield from paginated_object.values
@@ -125,7 +118,7 @@ def delete_all_transcriptions(api):
     # Delete all pre-existing completed transcriptions.
     # If transcriptions are still running or not started, they will not be deleted.
     for transcription in transcriptions:
-        transcription_id = transcription._self.split("/")[-1]
+        transcription_id = transcription._self.split('/')[-1]
         logging.debug(f"Deleting transcription with id {transcription_id}")
         try:
             api.delete_transcription(transcription_id)
@@ -139,15 +132,13 @@ def transcribe():
     # configure API key authorization: subscription_key
     configuration = cris_client.Configuration()
     configuration.api_key["Ocp-Apim-Subscription-Key"] = SUBSCRIPTION_KEY
-    configuration.host = (
-        f"https://{SERVICE_REGION}.api.cognitive.microsoft.com/speechtotext/v3.0"
-    )
+    configuration.host = f"https://{SERVICE_REGION}.api.cognitive.microsoft.com/speechtotext/v3.0"
 
     # create the client object and authenticate
     client = cris_client.ApiClient(configuration)
 
     # create an instance of the transcription api class
-    api = cris_client.DefaultApi(api_client=client)
+    api = cris_client.CustomSpeechTranscriptionsApi(api_client=client)
 
     # Specify transcription properties by passing a dict to the properties parameter. See
     # https://docs.microsoft.com/azure/cognitive-services/speech-service/batch-transcription#configuration-properties
@@ -155,37 +146,29 @@ def transcribe():
     properties = {
         # "punctuationMode": "DictatedAndAutomatic",
         # "profanityFilterMode": "Masked",
-        # "wordLevelTimestampsEnabled": True,
+        "wordLevelTimestampsEnabled": True,
         # "diarizationEnabled": True,
-        "destinationContainerUrl": "https://hatespeechaudio.blob.core.windows.net/transcripts?sp=racwdl&st=2022-04-02T09:56:49Z&se=2022-04-16T17:56:49Z&spr=https&sv=2020-08-04&sr=c&sig=6qfjiIjY831fcJjf21yLqNOsbmrOzhvjL41TGR340eI%3D",
+        "destinationContainerUrl": "https://hatespeechaudio.blob.core.windows.net/transcriptnew?sp=racwdl&st=2022-05-22T10:16:19Z&se=2022-05-22T18:16:19Z&spr=https&sv=2020-08-04&sr=c&sig=Pyq8IUKzCQ%2F%2F2BgnU%2FTttjh17nti7gOrKg0rW2ESwkQ%3D",
         # "timeToLive": "PT1H"
     }
 
     # Use base models for transcription. Comment this block if you are using a custom model.
-    # transcription_definition = transcribe_from_single_blob(
-    #     RECORDINGS_BLOB_URI, properties
-    # )
+    # transcription_definition = transcribe_from_single_blob(RECORDINGS_BLOB_URI, properties)
 
     # Uncomment this block to use custom models for transcription.
     # transcription_definition = transcribe_with_custom_model(api, RECORDINGS_BLOB_URI, properties)
 
     # Uncomment this block to transcribe all files from a container.
-    transcription_definition = transcribe_from_container(
-        RECORDINGS_CONTAINER_URI, properties
-    )
+    transcription_definition = transcribe_from_container(RECORDINGS_CONTAINER_URI, properties)
 
-    created_transcription, status, headers = api.create_transcription_with_http_info(
-        transcription=transcription_definition
-    )
+    created_transcription, status, headers = api.create_transcription_with_http_info(transcription=transcription_definition)
 
     # get the transcription Id from the location URI
     transcription_id = headers["location"].split("/")[-1]
 
     # Log information about the created transcription. If you should ask for support, please
     # include this information.
-    logging.info(
-        f"Created new transcription with id '{transcription_id}' in region {SERVICE_REGION}"
-    )
+    logging.info(f"Created new transcription with id '{transcription_id}' in region {SERVICE_REGION}")
 
     logging.info("Checking status.")
 
@@ -210,13 +193,9 @@ def transcribe():
                 audiofilename = file_data.name
                 results_url = file_data.links.content_url
                 results = requests.get(results_url)
-                logging.info(
-                    f"Results for {audiofilename}:\n{results.content.decode('utf-8')}"
-                )
+                logging.info(f"Results for {audiofilename}:\n{results.content.decode('utf-8')}")
         elif transcription.status == "Failed":
-            logging.info(
-                f"Transcription failed: {transcription.properties.error.message}"
-            )
+            logging.info(f"Transcription failed: {transcription.properties.error.message}")
 
 
 if __name__ == "__main__":
