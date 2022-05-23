@@ -20,7 +20,7 @@ class HateSpeechData(data.Dataset):
             if args.add_description:
                 self.metadata['desc'] = self.metadata['desc'].apply(lambda x: self.process_keyphrase_text(self.preprocess(x), args.desc_word_limit, args.desc_keyphrase_extract, args.desc_key_phrase_count))
             if args.add_transcription:
-                self.metadata['transcript'] = self.metadata['transcript'].apply(lambda x: self.process_keyphrase_text(x, args.transcript_word_limit, args.transcript_keyphrase_extract, args.transcript_key_phrase_count))
+                self.metadata['transcript'] = self.metadata['transcript'].apply(lambda x: self.process_keyphrase_text(self.preprocess(x), args.transcript_word_limit, args.transcript_keyphrase_extract, args.transcript_key_phrase_count))
             self.comments = pd.merge(self.comments, self.metadata, how='left', on='url')
 
     def preprocess(self, text):
