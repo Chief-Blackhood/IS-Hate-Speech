@@ -13,8 +13,7 @@ class HateSpeechData(data.Dataset):
             self.comments = self.load_comments(args.train_question_file)
         else:
             self.comments = self.load_comments(args.test_question_file)
-        
-        # TODO: Add Transcripts to extra_data.csv
+
         if args.add_title or args.add_description or args.add_transcription:
             self.metadata = self.load_metadata(args.metadata_path)
             if args.add_description:
@@ -55,12 +54,9 @@ class HateSpeechData(data.Dataset):
         return len(self.comments)
 
     def __getitem__(self, index):
-        context = self.comments['comment'][index]
-        if self.args.add_title:
-            context += ' [SEP] ' + self.comments['title'][index]
-        if self.args.add_description:
-            context += ' [SEP] ' + self.comments['desc'][index]
-        if self.args.add_transcription:
-            context += ' [SEP] ' + self.comments['transcript'][index]
+        comment = self.comments['comment'][index]
+        title = self.comments['title'][index] if self.args.add_title else None
+        desc = self.comments['desc'][index] if self.args.add_description else None
+        transcript = self.comments['transcript'][index] if self.args.add_transcription else None
         label = self.comments['label'][index]
-        return context, torch.FloatTensor([label])
+        return comment, title, desc, transcript, torch.FloatTensor([label])
