@@ -34,7 +34,7 @@ def get_params():
     parser.add_argument("--metadata_path", default='data/extra_data.csv', type=str, help='metadata for a video')
     parser.add_argument("--pad_metadata", default=True, type=ast.literal_eval, help="need to pad metadata")
     parser.add_argument("--add_title", default=False, type=ast.literal_eval, help="add title as context")
-    parser.add_argument("--title_token_count", default=False, type=50, help="token to consider of title")
+    parser.add_argument("--title_token_count", default=50, type=int, help="token to consider of title")
     parser.add_argument("--add_description", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--desc_keyphrase_extract", default=False, type=ast.literal_eval, help="find key phrase in a doc before adding as context")
     parser.add_argument("--desc_word_limit", default=200, type=int, help="number of words to consider from video description")
@@ -129,10 +129,10 @@ def eval_one_epoch(data_loader, epoch, phase):
     preds = []
     labels = []
     with torch.no_grad():
-        for itr, (comment, label) in enumerate(test_loader):
+        for itr, (comment, title, description, transcription, label) in enumerate(test_loader):
             label = label.to(device)
 
-            output = comment_model(lf_model.get_embeddings(comment)[1])
+            output = comment_model(lf_model.get_embeddings(comment, title, description, transcription)[1])
 
             loss = criterion(output, label)
 
