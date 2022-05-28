@@ -40,10 +40,17 @@ youtube_urls = [
 print(f"Date and time: {datetime.now()}")
 
 new_data = []
+count = 0
 for url in tqdm(youtube_urls[:50]):
+    count+=1
     data = get_youtube_data(url)
     if "stats" in data and "comments" in data:
         new_data.append(data)
+    if count % 10 == 0:
+       youtube_meta_data.extend(new_data)
+       new_data = [] 
+       with open("youtube_data.json", "w") as f:
+           json.dump(youtube_meta_data, f, indent=1)
 bitchute_meta_data.extend([get_bitchute_data(url) for url in bitchute_urls])
 youtube_meta_data.extend(new_data)
 

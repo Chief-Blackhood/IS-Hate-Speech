@@ -3,6 +3,7 @@
 .DS_Store
 youtube_data.json
 bitchute_data.json
+non_hate_youtube_data.json
 collect_data.*
 bitchute_videos/
 youtube_videos/

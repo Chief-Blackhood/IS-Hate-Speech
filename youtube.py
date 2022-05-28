@@ -1,9 +1,11 @@
 import requests
 import time
 
-my_api_key = "AIzaSyDMwd5_UXThkh4obbHSjju2BOKVnESF1rY"
+my_api_key = "AIzaSyCyegJgVEgui6-DZ56Ybg3trtC0UUjJvKQ"
 # AIzaSyCyegJgVEgui6-DZ56Ybg3trtC0UUjJvKQ
 # AIzaSyCrHyUDPCrxejbXYDCMPVCsSSZiDMaB1zM
+# AIzaSyAfBOr0N_6LJUambfkDveP9oFn1Vr1wD-A
+# AIzaSyDw6dyso5dM4WvhmbvqQB3r8hiOi0Ffy4A
 
 
 def fetch_comments_with_replies(video_id):
