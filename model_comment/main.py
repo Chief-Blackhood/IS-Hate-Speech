@@ -37,17 +37,10 @@ def get_params():
     parser.add_argument("--title_token_count", default=50, type=int, help="token to consider of title")
     parser.add_argument("--add_description", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--desc_keyphrase_extract", default=False, type=ast.literal_eval, help="find key phrase in a doc before adding as context")
-    parser.add_argument("--desc_word_limit", default=200, type=int, help="number of words to consider from video description")
-    parser.add_argument("--desc_key_phrase_count", default=50, type=int, help="number of key phrases to extract")
     parser.add_argument("--desc_token_count", default=100, type=int, help="number of token to consider of description")
     parser.add_argument("--add_transcription", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--transcript_keyphrase_extract", default=False, type=ast.literal_eval, help="find key phrase in a doc before adding as context")
-    parser.add_argument("--transcript_word_limit", default=1000, type=int, help="number of words to consider from video transcription")
-    parser.add_argument("--transcript_key_phrase_count", default=100, type=int, help="number of key phrases to extract")
     parser.add_argument("--transcript_token_count", default=300, type=int, help="number of token to consider of transcript")
-    parser.add_argument("--use_mmr", default=False, type=ast.literal_eval, help="whether to use Maximal Marginal Relevance (MMR) for the selection of keywords/keyphrases")
-    parser.add_argument("--diversity", default=0.5, type=float, help="differnce between the key phrases extracted")
-    parser.add_argument("--keyphrase_ngram_range", default=[1, 3], type=int, nargs='+', help="range of length, in words, of the extracted keywords/keyphrases")
     
     return parser.parse_args()
     
