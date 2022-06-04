@@ -213,14 +213,14 @@ for epoch in range(args.max_epochs):
         'best_acc' : eval_acc,
         'monitor': 'eval_acc',
         'optimizer': optimizer.state_dict()
-    }, os.path.join(args.work_dir, 'lf_model_' + str(epoch)+'.pth.tar'), is_better)
+    }, os.path.join(args.work_dir, 'lf_model_' + str(run.name) + '_' + str(epoch)+'.pth.tar'), is_better)
     save_checkpoint({ 'epoch': epoch ,
         'state_dict': comment_model.state_dict(),
         'best_loss': eval_loss,
         'best_acc' : eval_acc,
         'monitor': 'eval_acc',
         'vpm_optimizer': optimizer.state_dict()
-    }, os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar'), is_better)
+    }, os.path.join(args.work_dir, 'comment_model_' + str(run.name) + '_' + str(epoch)+'.pth.tar'), is_better)
    
     
 #load_weights('best')
