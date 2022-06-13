@@ -4,8 +4,6 @@ import argparse
 import ast
 import numpy as np
 from model import LFEmbeddingModule, CommentModel
-from keybert import KeyBERT
-import torch.optim as optim
 from torch import nn
 from dataloader import HateSpeechData
 from torch.utils.data import DataLoader
@@ -18,7 +16,7 @@ def get_params():
     parser.add_argument("--batch_size", default=8, type=int, help='batch size')
     parser.add_argument("--model", default='bert-large-uncased', choices=['bert-large-uncased', 'bert-base-uncased', 'allenai/longformer-base-4096', 'allenai/longformer-large-4096'], type=str, help='which model to try from bert-large, bert-base and longformer')
     parser.add_argument("--lr", default=0.0003, type=float, help='learning rate')
-    parser.add_argument("--num_workers", default=4, type=int, help='number of workers')
+    parser.add_argument("--num_workers", default=0, type=int, help='number of workers')
     parser.add_argument("--max_epochs", default=1, type=int, help='nummber of maximum epochs to run')
     parser.add_argument("--max_len", default=512, type=int, help='max len of input')
     parser.add_argument("--gpu", default='0', type=str, help='GPUs to use')
@@ -57,21 +55,21 @@ class AverageMeter(object):
 def accuracy(pred, labels):
     return np.sum(pred == labels)/pred.shape[0]
 
-def get_data_loaders(args, phase, key_bert_model):
+def get_data_loaders(args, phase):
     shuffle = True if phase == "train" else False
-    data = HateSpeechData(args, phase, key_bert_model)
+    data = HateSpeechData(args, phase)
     dataloader = DataLoader(data, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers)
     return dataloader
 
 def load_weights(lf_model, comment_model):
-    lf_checkpoint = os.path.join('./best_lf_model.pth.tar')
-    comment_checkpoint = os.path.join('./best_comment_model.pth.tar')
+    lf_checkpoint = os.path.join('./models/lf_model_dry_shape_68.pth.tar')
+    comment_checkpoint = os.path.join('./models/comment_model_dry_shape_68.pth.tar')
     
     lf_model.lf_model.load_state_dict(torch.load(lf_checkpoint)['state_dict'])
     comment_model.load_state_dict(torch.load(comment_checkpoint)['state_dict'])
     return lf_model, comment_model
 
-def eval_one_epoch(test_loader, epoch, phase, device, criterion, optimizer, lf_model, comment_model, args):
+def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, comment_model, args):
     lf_model.lf_model.eval()
     comment_model.eval()
 
@@ -107,21 +105,14 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterion, optimizer, lf_m
             
     return losses.avg, acces.avg, preds, labels
 
-kw_model = KeyBERT()
 args = get_params()
-test_loader = get_data_loaders(args, 'test', kw_model)
+test_loader = get_data_loaders(args, 'test')
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 lf_model = LFEmbeddingModule(args, device)
 comment_model = CommentModel(args).to(device)
 criterion = nn.BCELoss().to(device)
-params = []
-for model in [lf_model.lf_model, comment_model]:
-    params += list(model.parameters())
 
-optimizer = optim.Adam(params, lr = args.lr)
-
-
-test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, optimizer, lf_model, comment_model, args)
+test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
 print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
-np.save('../model-3-with-aug-test_preds.npy', np.array(test_pred))
+np.save('./test_preds.npy', np.array(test_pred))
