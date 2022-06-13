@@ -1,14 +1,14 @@
 import torch
 import torch.utils.data as data
 import pandas as pd
+import numpy as np
 
 
 class HateSpeechData(data.Dataset):
 
-    def __init__(self, args, phase, key_bert_model):
+    def __init__(self, args, phase):
 
         self.args = args
-        self.kw_model = key_bert_model
         if phase == 'train':
             self.comments = self.load_comments(args.train_question_file)
         else:
@@ -16,6 +16,7 @@ class HateSpeechData(data.Dataset):
 
         if args.add_title or args.add_description or args.add_transcription:
             self.metadata = self.load_metadata(args.metadata_path)
+            self.metadata = self.metadata.replace(np.nan, '', regex=True)
             if "bert" in self.args.model:
                 if self.args.desc_keyphrase_extract:
                     self.metadata['desc'] = self.metadata['key_phrases_desc_bert']

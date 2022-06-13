@@ -12,9 +12,6 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 import wandb
 import ast
 
-from yaml import parse
-from keybert import KeyBERT
-
 from dataloader import HateSpeechData
 from model import LFEmbeddingModule, CommentModel
 
@@ -31,7 +28,7 @@ def get_params():
     parser.add_argument("--max_len", default=512, type=int, help='max len of input')
     parser.add_argument("--gpu", default='0', type=str, help='GPUs to use')
     parser.add_argument("--freeze_lf_layers", default=23, type=int, help='number of layers to freeze in BERT or LF')
-    parser.add_argument("--metadata_path", default='data/extra_data.csv', type=str, help='metadata for a video')
+    parser.add_argument("--metadata_path", default='data/extra_data_trans.csv', type=str, help='metadata for a video')
     parser.add_argument("--pad_metadata", default=True, type=ast.literal_eval, help="need to pad metadata")
     parser.add_argument("--add_title", default=False, type=ast.literal_eval, help="add title as context")
     parser.add_argument("--title_token_count", default=50, type=int, help="token to consider of title")
@@ -65,20 +62,22 @@ class AverageMeter(object):
 def accuracy(pred, labels):
     return np.sum(pred == labels)/pred.shape[0]
 
-def save_checkpoint(state, filename='checkpoint.pth.tar', is_best=False):
+def save_checkpoint(state, args, name, filename='checkpoint.pth.tar', is_best=False):
     # torch.save(state, filename)
     if is_best:
-        best_filename = 'best_lf_model.pth.tar' if 'lf_model' in filename else 'best_comment_model.pth.tar'
+        lf_filename = os.path.join(args.work_dir, 'lf_model_' + str(name) +'.pth.tar')
+        comment_filename = os.path.join(args.work_dir, 'comment_model_' + str(name) +'.pth.tar')
+        best_filename = lf_filename if 'lf_model' in filename else comment_filename
         torch.save(state, best_filename)
         # shutil.copyfile(filename, best_filename)
         
-def get_data_loaders(args, phase, key_bert_model):
+def get_data_loaders(args, phase):
     shuffle = True if phase == "train" else False
-    data = HateSpeechData(args, phase, key_bert_model)
+    data = HateSpeechData(args, phase)
     dataloader = DataLoader(data, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers)
     return dataloader
 
-def train_one_epoch(train_loader, epoch, phase):
+def train_one_epoch(train_loader, epoch, phase, device, criterion, optimizer, lf_model, comment_model, args):
     
     lf_model.lf_model.train()
     comment_model.train()
@@ -112,7 +111,7 @@ def train_one_epoch(train_loader, epoch, phase):
         
     return losses.avg, acces.avg
         
-def eval_one_epoch(data_loader, epoch, phase):
+def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, comment_model, args):
     lf_model.lf_model.eval()
     comment_model.eval()
 
@@ -144,12 +143,12 @@ def eval_one_epoch(data_loader, epoch, phase):
                 print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d} \t'
                     'loss {loss.val:.4f} ({loss.avg:.4f})\t'
                     'accu {acc.val:.3f} ({acc.avg:.3f})\t'.format(
-                    epoch, itr, len(data_loader), loss=losses, acc=acces))
+                    epoch, itr, len(test_loader), loss=losses, acc=acces))
             
     return losses.avg, acces.avg, preds, labels
 
 
-def load_weights(epoch):
+def load_weights(epoch, lf_model, comment_model, args):
     lf_checkpoint = os.path.join(args.work_dir, 'lf_model_' + str(epoch)+'.pth.tar')
     comment_checkpoint = os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar')
     
@@ -157,75 +156,76 @@ def load_weights(epoch):
     comment_model.load_state_dict(torch.load(comment_checkpoint)['state_dict'])
     return 
     
+def main():  
+    args = get_params()
+    run = wandb.init(project='hatespeech', entity='is_project')
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
+    device = torch.device("cuda")
+    print('number of available devices:', torch.cuda.device_count())
+
+    train_loader = get_data_loaders(args, 'train')
+    test_loader = get_data_loaders(args, 'test')
+    print('obtained dataloaders')
+
+    lf_model = LFEmbeddingModule(args, device)
+    comment_model = CommentModel(args).to(device)
+    criterion = nn.BCELoss().to(device)
+
+    config = wandb.config
+    config.lr = args.lr
+    wandb.watch(lf_model.lf_model)
+    wandb.watch(comment_model)
+
+    params = []
+    for model in [lf_model.lf_model, comment_model]:
+        params += list(model.parameters())
+
+    optimizer = optim.Adam(params, lr = args.lr)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
+    print('loaded models')
+
+    if not os.path.exists(args.work_dir):
+        os.mkdir(args.work_dir)
     
-args = get_params()
-args.keyphrase_ngram_range = tuple(args.keyphrase_ngram_range)
-run = wandb.init(project='hatespeech', entity='is_project')
-os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-device = torch.device("cuda")
-print('number of available devices:', torch.cuda.device_count())
-
-kw_model = KeyBERT()
-train_loader = get_data_loaders(args, 'train', kw_model)
-test_loader = get_data_loaders(args, 'test', kw_model)
-print('obtained dataloaders')
-
-lf_model = LFEmbeddingModule(args, device)
-comment_model = CommentModel(args).to(device)
-criterion = nn.BCELoss().to(device)
-
-config = wandb.config
-config.lr = args.lr
-wandb.watch(lf_model.lf_model)
-wandb.watch(comment_model)
-
-params = []
-for model in [lf_model.lf_model, comment_model]:
-    params += list(model.parameters())
-
-optimizer = optim.Adam(params, lr = args.lr)
-scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
-print('loaded models')
-
-if not os.path.exists(args.work_dir):
-    os.mkdir(args.work_dir)
- 
-best_eval_acc = 0
-train_acc = 0
-eval_acc = 0
-train_loss = 0
-eval_loss = 0
-for epoch in range(args.max_epochs):
-    train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train')
-    eval_loss, eval_acc, pred, label = eval_one_epoch(test_loader, epoch, 'Eval')
-    print('Epoch-{:<3d} Train: loss {:.4f}\taccu {:.4f}\tEval: loss {:.4f}\taccu {:.4f}'
-            .format(epoch, train_loss, train_acc, eval_loss, eval_acc))
-    wandb.log({'Train Loss': train_loss, 'Train Acc': train_acc, 'Eval Loss': eval_loss, 'Eval Acc': eval_acc})
-    scheduler.step(eval_loss)
-    is_better = False
-    if eval_acc >= best_eval_acc:
-        best_eval_acc = eval_acc
-        is_better = True
+    best_eval_acc = 0
+    train_acc = 0
+    eval_acc = 0
+    train_loss = 0
+    eval_loss = 0
+    for epoch in range(args.max_epochs):
+        train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterion, optimizer, lf_model, comment_model, args)
+        eval_loss, eval_acc, pred, label = eval_one_epoch(test_loader, epoch, 'Eval', device, criterion, lf_model, comment_model, args)
+        print('Epoch-{:<3d} Train: loss {:.4f}\taccu {:.4f}\tEval: loss {:.4f}\taccu {:.4f}'
+                .format(epoch, train_loss, train_acc, eval_loss, eval_acc))
+        wandb.log({'Train Loss': train_loss, 'Train Acc': train_acc, 'Eval Loss': eval_loss, 'Eval Acc': eval_acc})
+        scheduler.step(eval_loss)
+        is_better = False
+        if eval_acc >= best_eval_acc:
+            best_eval_acc = eval_acc
+            is_better = True
+        
+        save_checkpoint({ 'epoch': epoch,
+            'state_dict': lf_model.lf_model.state_dict(),
+            'best_loss': eval_loss,
+            'best_acc' : eval_acc,
+            'monitor': 'eval_acc',
+            'optimizer': optimizer.state_dict()
+        }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
+        save_checkpoint({ 'epoch': epoch ,
+            'state_dict': comment_model.state_dict(),
+            'best_loss': eval_loss,
+            'best_acc' : eval_acc,
+            'monitor': 'eval_acc',
+            'vpm_optimizer': optimizer.state_dict()
+        }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
     
-    save_checkpoint({ 'epoch': epoch,
-        'state_dict': lf_model.lf_model.state_dict(),
-        'best_loss': eval_loss,
-        'best_acc' : eval_acc,
-        'monitor': 'eval_acc',
-        'optimizer': optimizer.state_dict()
-    }, os.path.join(args.work_dir, 'lf_model_' + str(run.name) + '_' + str(epoch)+'.pth.tar'), is_better)
-    save_checkpoint({ 'epoch': epoch ,
-        'state_dict': comment_model.state_dict(),
-        'best_loss': eval_loss,
-        'best_acc' : eval_acc,
-        'monitor': 'eval_acc',
-        'vpm_optimizer': optimizer.state_dict()
-    }, os.path.join(args.work_dir, 'comment_model_' + str(run.name) + '_' + str(epoch)+'.pth.tar'), is_better)
-   
-    
-#load_weights('best')
-test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test')
-print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
-print(os.path.join(args.work_dir, 'test_preds.npy'))
-np.save(os.path.join(args.work_dir, 'test_preds.npy'), np.array(test_pred))
-np.save(os.path.join(args.work_dir, 'test_labels.npy'), np.array(test_label))
+        
+    #load_weights('best')
+    test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, optimizer, lf_model, comment_model)
+    print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
+    print(os.path.join(args.work_dir, 'test_preds.npy'))
+    np.save(os.path.join(args.work_dir, 'test_preds.npy'), np.array(test_pred))
+    np.save(os.path.join(args.work_dir, 'test_labels.npy'), np.array(test_label))
+
+if __name__ == "__main__":
+    main()
