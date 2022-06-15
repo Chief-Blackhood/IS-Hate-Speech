@@ -5,7 +5,7 @@ from transformers import LongformerModel, LongformerTokenizer
 from transformers import BertTokenizer, BertModel
 
 
-class LFEmbeddingModule():
+class LFEmbeddingModule(nn.Module):
     def __init__(self, args, device):
         super(LFEmbeddingModule, self).__init__()
         self.args = args

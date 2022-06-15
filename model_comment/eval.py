@@ -118,4 +118,4 @@ lf_model, comment_model = load_weights(lf_model, comment_model)
 
 test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
 print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
-np.save('./test_preds.npy', np.array(test_pred))
+np.save('./eval_test_preds.npy', np.array(test_pred))

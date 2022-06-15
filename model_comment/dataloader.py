@@ -13,7 +13,6 @@ class HateSpeechData(data.Dataset):
             self.comments = self.load_comments(args.train_question_file)
         else:
             self.comments = self.load_comments(args.test_question_file)
-
         if args.add_title or args.add_description or args.add_transcription:
             self.metadata = self.load_metadata(args.metadata_path)
             self.metadata = self.metadata.replace(np.nan, '', regex=True)
