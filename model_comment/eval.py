@@ -62,11 +62,13 @@ def get_data_loaders(args, phase):
     return dataloader
 
 def load_weights(lf_model, comment_model):
-    lf_checkpoint = os.path.join('./models/lf_model_dry_shape_68.pth.tar')
-    comment_checkpoint = os.path.join('./models/comment_model_dry_shape_68.pth.tar')
-    
-    lf_model.lf_model.load_state_dict(torch.load(lf_checkpoint)['state_dict'])
-    comment_model.load_state_dict(torch.load(comment_checkpoint)['state_dict'])
+    lf_path = os.path.join('models/lf_model_dry-shape-68.pth.tar')
+    comment_path = os.path.join('models/comment_model_dry-shape-68.pth.tar')
+    lf_checkpoint = torch.load(lf_path, map_location=torch.device('cpu'))
+    comment_checkpoint = torch.load(comment_path, map_location=torch.device('cpu'))
+    lf_model.load_state_dict(lf_checkpoint['state_dict'])
+    comment_model.load_state_dict(comment_checkpoint['state_dict'])
+
     return lf_model, comment_model
 
 def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, comment_model, args):
@@ -112,6 +114,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 lf_model = LFEmbeddingModule(args, device)
 comment_model = CommentModel(args).to(device)
 criterion = nn.BCELoss().to(device)
+lf_model, comment_model = load_weights(lf_model, comment_model)
 
 test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
 print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
