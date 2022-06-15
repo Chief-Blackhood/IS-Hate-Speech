@@ -52,13 +52,13 @@ class LFEmbeddingModule(nn.Module):
     
 class CommentModel(nn.Module):
     def __init__(self, args):
+        super(CommentModel, self).__init__()
         self.args = args
         if 'base' in self.args.model:
             self.fc_size = 768
         else:
             self.fc_size = 1024
 
-        super(CommentModel, self).__init__()
         self.fc = nn.Sequential(
             nn.Linear(self.fc_size, 1),
             nn.Sigmoid()
