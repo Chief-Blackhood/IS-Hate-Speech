@@ -223,9 +223,9 @@ def main():
     #load_weights('best')
     test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
     print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
-    print(f'{args.work_dir}/test_preds_{run.name}.npy'))
-    np.save(f'{args.work_dir}/test_preds_{run.name}.npy'), np.array(test_pred))
-    np.save(f'{args.work_dir}/test_labels_{run.name}.npy'), np.array(test_label))
+    print(f'{args.work_dir}/test_preds_{run.name}.npy')
+    np.save(f'{args.work_dir}/test_preds_{run.name}.npy'), np.array(test_pred)
+    np.save(f'{args.work_dir}/test_labels_{run.name}.npy'), np.array(test_label)
 
 if __name__ == "__main__":
     main()
