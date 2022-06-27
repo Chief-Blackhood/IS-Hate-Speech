@@ -1,4 +1,5 @@
 from operator import index
+from numpy import pad
 import torch
 from torch import nn
 from transformers import LongformerModel, LongformerTokenizer
@@ -24,12 +25,13 @@ class LFEmbeddingModule(nn.Module):
                 param.requires_grad = False
         
         
-    def get_embeddings(self, comments, titles, descriptions, transcripts):
+    def get_embeddings(self, comments, titles, descriptions, transcripts, other_comments):
         indexed_cs = []
         max_len_total = self.args.max_len
         max_len_title = self.args.title_token_count
         max_len_desc = self.args.desc_token_count
         max_len_trans = self.args.transcript_token_count
+        max_len_other_comments = self.args.other_comments_token_count
         padding = 'max_length' if self.args.pad_metadata else False
         for comment, title, desc, transcript in zip(comments, titles, descriptions, transcripts):
 
@@ -43,6 +45,9 @@ class LFEmbeddingModule(nn.Module):
             if self.args.add_transcription:
                 enc_tr = self.lf_tokenizer.encode_plus(transcript, max_length=max_len_trans, padding=padding, truncation=True)['input_ids']
                 enc_c.extend(enc_tr[1:])
+            if self.args.add_other_comments:
+                enc_oc = self.lf_tokenizer.encode_plus(other_comments, max_length=max_len_other_comments, padding=padding, trucation=True)['input_ids']
+                enc_c.extend(enc_oc[1:])
             enc_c = enc_c[:max_len_total]
             enc_c.extend((max_len_total - len(enc_c))*[self.lf_tokenizer.pad_token_id])
             indexed_cs.append(enc_c)

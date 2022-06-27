@@ -10,9 +10,13 @@ class HateSpeechData(data.Dataset):
 
         self.args = args
         if phase == 'train':
-            self.comments = self.load_comments(args.train_question_file)
+            self.comments = self.load_comments(self.args.train_question_file)
         else:
-            self.comments = self.load_comments(args.test_question_file)
+            self.comments = self.load_comments(self.args.test_question_file)
+        if args.add_other_comments:
+            self.other_comments_data = self.load_metadata(self.args.other_comments_path)
+            if "longformer" in self.args.model:
+                self.comments = pd.merge(self.comments, self.other_comments_data, how='left', on=['url', 'comment'])
         if args.add_title or args.add_description or args.add_transcription:
             self.metadata = self.load_metadata(args.metadata_path)
             self.metadata = self.metadata.replace(np.nan, '', regex=True)
@@ -45,5 +49,6 @@ class HateSpeechData(data.Dataset):
         title = self.comments['title'][index] if self.args.add_title else None
         desc = self.comments['desc'][index] if self.args.add_description else None
         transcript = self.comments['transcript'][index] if self.args.add_transcription else None
+        other_comments = self.comments['Key_phrases_other_comments'] if self.args.add_other_comments else None
         label = self.comments['label'][index]
-        return comment, title, desc, transcript, torch.FloatTensor([label])
+        return comment, title, desc, transcript, other_comments, torch.FloatTensor([label])

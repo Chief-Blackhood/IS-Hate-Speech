@@ -38,6 +38,8 @@ def get_params():
     parser.add_argument("--add_transcription", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--transcript_keyphrase_extract", default=False, type=ast.literal_eval, help="find key phrase in a doc before adding as context")
     parser.add_argument("--transcript_token_count", default=300, type=int, help="number of token to consider of transcript")
+    parser.add_argument("--add_other_comments", default=False, type=ast.literal_eval, help="add description as context")
+    parser.add_argument("--other_comments_token_count", default=300, type=int, help="number of token to consider of transcript")
     
     return parser.parse_args()
     
@@ -85,10 +87,10 @@ def train_one_epoch(train_loader, epoch, phase, device, criterion, optimizer, lf
     losses = AverageMeter()
     acces = AverageMeter()
     
-    for itr, (comment, title, description, transcription, label) in enumerate(train_loader):
+    for itr, (comment, title, description, transcription, other_comments, label) in enumerate(train_loader):
         label = label.to(device)
 
-        output = comment_model(lf_model.get_embeddings(comment, title, description, transcription)[1])
+        output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1])
 
         loss = criterion(output, label)        
         
@@ -121,10 +123,10 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, comme
     preds = []
     labels = []
     with torch.no_grad():
-        for itr, (comment, title, description, transcription, label) in enumerate(test_loader):
+        for itr, (comment, title, description, transcription, other_comments, label) in enumerate(test_loader):
             label = label.to(device)
 
-            output = comment_model(lf_model.get_embeddings(comment, title, description, transcription)[1])
+            output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1])
 
             loss = criterion(output, label)
 
@@ -224,8 +226,8 @@ def main():
     test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
     print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
     print(f'{args.work_dir}/test_preds_{run.name}.npy')
-    np.save(f'{args.work_dir}/test_preds_{run.name}.npy'), np.array(test_pred)
-    np.save(f'{args.work_dir}/test_labels_{run.name}.npy'), np.array(test_label)
+    np.save(f'{args.work_dir}/test_preds_{run.name}.npy', np.array(test_pred))
+    np.save(f'{args.work_dir}/test_labels_{run.name}.npy', np.array(test_label))
 
 if __name__ == "__main__":
     main()
