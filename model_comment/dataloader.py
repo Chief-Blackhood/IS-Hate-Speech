@@ -15,8 +15,7 @@ class HateSpeechData(data.Dataset):
             self.comments = self.load_comments(self.args.test_question_file)
         if args.add_other_comments:
             self.other_comments_data = self.load_metadata(self.args.other_comments_path)
-            if "longformer" in self.args.model:
-                self.comments = pd.merge(self.comments, self.other_comments_data, how='left', on=['url', 'comment'])
+            self.comments = pd.merge(self.comments, self.other_comments_data, how='left', on=['url', 'comment'])
         if args.add_title or args.add_description or args.add_transcription:
             self.metadata = self.load_metadata(args.metadata_path)
             self.metadata = self.metadata.replace(np.nan, '', regex=True)
@@ -31,6 +30,7 @@ class HateSpeechData(data.Dataset):
                 if self.args.transcript_keyphrase_extract:
                     self.metadata['transcript'] = self.metadata['key_phrases_transcript_long']
             self.comments = pd.merge(self.comments, self.metadata, how='left', on='url')
+        self.comments.drop_duplicates(inplace=True)
 
     def load_metadata(self, filename):
         df = pd.read_csv(filename)

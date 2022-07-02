@@ -160,7 +160,7 @@ def load_weights(epoch, lf_model, comment_model, args):
     
 def main():  
     args = get_params()
-    run = wandb.init(project='hatespeech', entity='is_project')
+    run = wandb.init(project='final_models', entity='is_project')
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     device = torch.device("cuda")
     print('number of available devices:', torch.cuda.device_count())
