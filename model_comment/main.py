@@ -21,7 +21,7 @@ def get_params():
     parser.add_argument("--train_question_file", default='data/with_aug/train.csv', type=str, help='train data')
     parser.add_argument("--test_question_file", default='data/with_aug/test.csv', type=str, help='test data')
     parser.add_argument("--batch_size", default=8, type=int, help='batch size')
-    parser.add_argument("--model", default='bert-large-uncased', choices=['bert-large-uncased', 'bert-base-uncased', 'allenai/longformer-base-4096', 'allenai/longformer-large-4096'], type=str, help='which model to try from bert-large, bert-base and longformer')
+    parser.add_argument("--model", default='bert-large-cased', choices=['bert-large-cased', 'bert-base-cased', 'allenai/longformer-base-4096', 'allenai/longformer-large-4096'], type=str, help='which model to try from bert-large, bert-base and longformer')
     parser.add_argument("--lr", default=0.0003, type=float, help='learning rate')
     parser.add_argument("--num_workers", default=4, type=int, help='number of workers')
     parser.add_argument("--max_epochs", default=1, type=int, help='nummber of maximum epochs to run')
