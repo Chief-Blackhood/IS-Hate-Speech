@@ -38,6 +38,7 @@ def get_params():
     parser.add_argument("--add_transcription", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--transcript_keyphrase_extract", default=False, type=ast.literal_eval, help="find key phrase in a doc before adding as context")
     parser.add_argument("--transcript_token_count", default=300, type=int, help="number of token to consider of transcript")
+    parser.add_argument("--other_comments_path", default='data/extra_data_other_comments.csv', type=str, help='other comments data for a video')
     parser.add_argument("--add_other_comments", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--other_comments_token_count", default=300, type=int, help="number of token to consider of transcript")
     
