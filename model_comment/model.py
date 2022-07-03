@@ -35,7 +35,7 @@ class LFEmbeddingModule(nn.Module):
         padding = 'max_length' if self.args.pad_metadata else False
         for comment, title, desc, transcript in zip(comments, titles, descriptions, transcripts):
 
-            enc_c = self.lf_tokenizer.encode_plus(comment)['input_ids']
+            enc_c = self.lf_tokenizer.encode_plus(comment, max_length=max_len_total, padding=False, truncation=True)['input_ids']
             if self.args.add_title:
                 enc_t = self.lf_tokenizer.encode_plus(title, max_length=max_len_title, padding=padding, truncation=True)['input_ids']
                 enc_c.extend(enc_t[1:])
