@@ -49,6 +49,6 @@ class HateSpeechData(data.Dataset):
         title = self.comments['title'][index] if self.args.add_title else ''
         desc = self.comments['desc'][index] if self.args.add_description else ''
         transcript = self.comments['transcript'][index] if self.args.add_transcription else ''
-        other_comments = self.comments['Key_phrases_other_comments'] if self.args.add_other_comments else ''
+        other_comments = self.comments['key_phrases_other_comments'] if self.args.add_other_comments else ''
         label = self.comments['label'][index]
         return comment, title, desc, transcript, other_comments, torch.FloatTensor([label])
