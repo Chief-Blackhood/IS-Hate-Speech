@@ -14,7 +14,6 @@ class LFEmbeddingModule(nn.Module):
             self.lf_model = LongformerModel.from_pretrained(self.args.model, output_hidden_states=True).to(device)
             self.lf_tokenizer = LongformerTokenizer.from_pretrained(self.args.model)
         else:
-            print("hi")
             self.lf_model = BertModel.from_pretrained(self.args.model, output_hidden_states=True).to(device)
             self.lf_tokenizer = BertTokenizer.from_pretrained(self.args.model)
 
@@ -33,7 +32,7 @@ class LFEmbeddingModule(nn.Module):
         max_len_trans = self.args.transcript_token_count
         max_len_other_comments = self.args.other_comments_token_count
         padding = 'max_length' if self.args.pad_metadata else False
-        for comment, title, desc, transcript in zip(comments, titles, descriptions, transcripts):
+        for comment, title, desc, transcript, other_comment in zip(comments, titles, descriptions, transcripts, other_comments):
 
             enc_c = self.lf_tokenizer.encode_plus(comment, max_length=max_len_total, padding=False, truncation=True)['input_ids']
             if self.args.add_title:
@@ -46,7 +45,7 @@ class LFEmbeddingModule(nn.Module):
                 enc_tr = self.lf_tokenizer.encode_plus(transcript, max_length=max_len_trans, padding=padding, truncation=True)['input_ids']
                 enc_c.extend(enc_tr[1:])
             if self.args.add_other_comments:
-                enc_oc = self.lf_tokenizer.encode_plus(other_comments, max_length=max_len_other_comments, padding=padding, trucation=True)['input_ids']
+                enc_oc = self.lf_tokenizer.encode_plus(other_comment, max_length=max_len_other_comments, padding=padding, truncation=True)['input_ids']
                 enc_c.extend(enc_oc[1:])
             enc_c = enc_c[:max_len_total]
             enc_c.extend((max_len_total - len(enc_c))*[self.lf_tokenizer.pad_token_id])

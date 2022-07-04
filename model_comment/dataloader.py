@@ -30,7 +30,9 @@ class HateSpeechData(data.Dataset):
                 if self.args.transcript_keyphrase_extract:
                     self.metadata['transcript'] = self.metadata['key_phrases_transcript_long']
             self.comments = pd.merge(self.comments, self.metadata, how='left', on='url')
+        self.comments = self.comments.replace(np.nan, '', regex=True)
         self.comments.drop_duplicates(inplace=True)
+        self.comments = self.comments.reset_index(drop=True)
 
     def load_metadata(self, filename):
         df = pd.read_csv(filename)
@@ -49,6 +51,6 @@ class HateSpeechData(data.Dataset):
         title = self.comments['title'][index] if self.args.add_title else ''
         desc = self.comments['desc'][index] if self.args.add_description else ''
         transcript = self.comments['transcript'][index] if self.args.add_transcription else ''
-        other_comments = self.comments['key_phrases_other_comments'] if self.args.add_other_comments else ''
+        other_comment = self.comments['key_phrases_other_comments'][index] if self.args.add_other_comments else ''
         label = self.comments['label'][index]
-        return comment, title, desc, transcript, other_comments, torch.FloatTensor([label])
+        return comment, title, desc, transcript, other_comment, torch.FloatTensor([label])
