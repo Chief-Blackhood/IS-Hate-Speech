@@ -49,6 +49,12 @@ non_hate_df.drop(
     inplace=True,
 )
 
+def assign(text):
+    if text != text:
+        return 'None'
+    else:
+        return text
+
 df = pd.concat([hate_df, non_hate_df])
 df['comment'] = df['comment'].apply(lambda x: " ".join(x.split()))
 train_df = pd.read_csv('data/without_aug/train.csv')
@@ -58,14 +64,14 @@ train_df = train_df[train_df["comment"] != '']
 test_df['comment'] = test_df['comment'].apply(lambda x: " ".join(x.split()))
 train_df = pd.merge(train_df, df, how='left', on=['url', 'comment'])
 test_df = pd.merge(test_df, df, how='left', on=['url', 'comment'])
+test_df['target'] = test_df['target'].apply(lambda x: assign(x))
 train_df.to_csv('data/hate_towards_whom_org/train.csv', index=False)
 test_df.to_csv('data/hate_towards_whom_org/test.csv', index=False)
 
 train_df = pd.read_csv('data/hate_towards_whom_org/train.csv')
-# test_df = pd.read_csv('data/hate_towards_whom_org/test.csv', index=False)
 
 def check(text):
-    if text in ['Individual', 'Organisation', 'Location', 'Community']:
+    if text in ['Individual', 'Organisation', 'Location', 'Community', 'None']:
         return True
     return False
 
@@ -88,8 +94,19 @@ for index, row in train_aug_df.iterrows():
         prev_target = "None"
         target.append(prev_target)
 
-
 train_aug_df['target'] = target
+train_aug_df.to_csv('data/hate_towards_whom_aug/train.csv', index=False)
+
+
+def clean(text):
+    text = re.sub(r"[\(\[].*?[\)\]]", "", text)
+    text = re.sub(r",", "", text)
+    text = ",".join([cat for cat in sorted(list(set(text.split()))) if check(cat)])
+    return text
+        
+test_aug_df = pd.read_csv('data/hate_towards_whom_org/test.csv')
+test_aug_df['target'] = test_aug_df['target'].apply(lambda x: clean(x))
+
+test_aug_df.to_csv('data/hate_towards_whom_aug/test.csv', index=False)
+print(test_aug_df['target'].value_counts())
 print(train_aug_df['target'].value_counts())
-# print(train_aug_df[train_aug_df['target'] == ''])
-# train_aug_df.to_csv('data/hate_towards_whom_aug/train.csv', index=False)

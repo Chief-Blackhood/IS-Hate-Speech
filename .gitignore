@@ -13,7 +13,6 @@ wandb/
 wandb_key
 *.zip
 cardiffnlp
-test*
 transcripts
 LAL-Parser
 models
