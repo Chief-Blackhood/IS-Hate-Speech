@@ -62,11 +62,16 @@ class CommentModel(nn.Module):
             self.fc_size = 768
         else:
             self.fc_size = 1024
-
-        self.fc = nn.Sequential(
-            nn.Linear(self.fc_size, 1),
-            nn.Sigmoid()
-        )
+        if self.args.multilabel:
+            self.fc = nn.Sequential(
+                nn.Linear(self.fc_size, 5),
+                # nn.Softmax(5)
+            )
+        else:    
+            self.fc = nn.Sequential(
+                nn.Linear(self.fc_size, 1),
+                nn.Sigmoid()
+            )
 
     def forward(self, text_emb):
         out = self.fc(text_emb)

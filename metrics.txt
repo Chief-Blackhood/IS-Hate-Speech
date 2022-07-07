@@ -1,0 +1,72 @@
+
+The metrics for charmed-spaceship-25 run are:
+     Precision: 0.9238095238095239
+     Recall: 0.9150943396226415
+     F1 score: 0.9194312796208531
+     Accuracy: 0.9178743961352657
+
+The metrics for earthy-durian-6 run are:
+     Precision: 0.7164179104477612
+     Recall: 0.9142857142857143
+     F1 score: 0.803347280334728
+     Accuracy: 0.7729468599033816
+
+The metrics for ethereal-blaze-26 run are:
+     Precision: 0.9428571428571428
+     Recall: 0.9252336448598131
+     F1 score: 0.9339622641509434
+     Accuracy: 0.9323671497584541
+
+The metrics for fallen-totem-15 run are:
+     Precision: 0.9238095238095239
+     Recall: 0.9150943396226415
+     F1 score: 0.9194312796208531
+     Accuracy: 0.9178743961352657
+
+The metrics for fragrant-sun-7 run are:
+     Precision: 0.9238095238095239
+     Recall: 0.8899082568807339
+     F1 score: 0.9065420560747663
+     Accuracy: 0.9033816425120773
+
+The metrics for glamorous-fire-27 run are:
+     Precision: 0.8415841584158416
+     Recall: 0.8095238095238095
+     F1 score: 0.8252427184466018
+     Accuracy: 0.8260869565217391
+
+The metrics for hopeful-microwave-11 run are:
+     Precision: 0.9134615384615384
+     Recall: 0.9047619047619048
+     F1 score: 0.9090909090909091
+     Accuracy: 0.9082125603864735
+
+The metrics for soft-pyramid-14 run are:
+     Precision: 0.9142857142857143
+     Recall: 0.9056603773584906
+     F1 score: 0.909952606635071
+     Accuracy: 0.9082125603864735
+
+The metrics for stilted-haze-8 run are:
+     Precision: 0.8952380952380953
+     Recall: 0.9306930693069307
+     F1 score: 0.9126213592233011
+     Accuracy: 0.9130434782608695
+
+The metrics for vibrant-elevator-5 run are:
+     Precision: 1.0
+     Recall: 0.5072463768115942
+     F1 score: 0.6730769230769231
+     Accuracy: 0.5072463768115942
+
+The metrics for woven-fog-10 run are:
+     Precision: 0.9238095238095239
+     Recall: 0.9150943396226415
+     F1 score: 0.9194312796208531
+     Accuracy: 0.9178743961352657
+
+The metrics for youthful-brook-11 run are:
+     Precision: 0.8952380952380953
+     Recall: 0.94
+     F1 score: 0.9170731707317075
+     Accuracy: 0.9178743961352657

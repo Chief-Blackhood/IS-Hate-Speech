@@ -7,7 +7,8 @@ import numpy as np
 class HateSpeechData(data.Dataset):
 
     def __init__(self, args, phase):
-
+        if args.multilabel:
+            self.mapping = {"Organisation": 0, "Location": 1, "Individual": 2, "Community": 3, "None": 4}
         self.args = args
         if phase == 'train':
             self.comments = self.load_comments(self.args.train_question_file)
@@ -52,5 +53,14 @@ class HateSpeechData(data.Dataset):
         desc = self.comments['desc'][index] if self.args.add_description else ''
         transcript = self.comments['transcript'][index] if self.args.add_transcription else ''
         other_comment = self.comments['key_phrases_other_comments'][index] if self.args.add_other_comments else ''
-        label = self.comments['label'][index]
-        return comment, title, desc, transcript, other_comment, torch.FloatTensor([label])
+        if self.args.multilabel:
+            target = np.zeros(5, dtype=float)
+            labels = self.comments['target'][index].split(',')
+            for label in labels:
+                label = label.strip()
+                target[self.mapping[label]] = 1
+            target = torch.FloatTensor(target)
+        else:
+            label = self.comments['label'][index]
+            target = torch.FloatTensor(label) 
+        return comment, title, desc, transcript, other_comment, target

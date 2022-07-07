@@ -16,3 +16,6 @@ cardiffnlp
 transcripts
 LAL-Parser
 models
+npy_files/
+test.ipynb
+keyphrases_other_comments.json
