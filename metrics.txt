@@ -70,3 +70,23 @@ The metrics for youthful-brook-11 run are:
      Recall: 0.94
      F1 score: 0.9170731707317075
      Accuracy: 0.9178743961352657
+
+The metrics for charmed-river-32 run are: (Multilabel Hate Towards Whom)
+     Thresh: 0.0 	Hamming Loss: 0.7951690821256039 	Acc Score: 0.0
+     Thresh: 0.1 	Hamming Loss: 0.13333333333333333 	Acc Score: 0.5990338164251208
+     Thresh: 0.2 	Hamming Loss: 0.12560386473429952 	Acc Score: 0.6328502415458938
+     Thresh: 0.30000000000000004 	Hamming Loss: 0.11690821256038647 	Acc Score: 0.6666666666666666
+     Thresh: 0.4 	Hamming Loss: 0.11594202898550725 	Acc Score: 0.6763285024154589
+     Thresh: 0.5 	Hamming Loss: 0.11400966183574879 	Acc Score: 0.6908212560386473
+     Thresh: 0.6000000000000001 	Hamming Loss: 0.10821256038647344 	Acc Score: 0.6859903381642513
+     Thresh: 0.7000000000000001 	Hamming Loss: 0.09855072463768116 	Acc Score: 0.6666666666666666
+     Thresh: 0.8 	Hamming Loss: 0.10048309178743961 	Acc Score: 0.6280193236714976
+     Thresh: 0.9 	Hamming Loss: 0.10144927536231885 	Acc Score: 0.6038647342995169
+     Thresh: 1.0 	Hamming Loss: 0.20483091787439614 	Acc Score: 0.0
+
+     Using Threshold of 0.5:
+          Organisation Precision: 0.375 Recall: 0.2727272727272727 F1 Score: 0.3157894736842105
+          Location Precision: 0.4 Recall: 0.3333333333333333 F1 Score: 0.3636363636363636
+          Individual Precision: 0.6111111111111112 Recall: 0.6226415094339622 F1 Score: 0.616822429906542
+          Community Precision: 0.5277777777777778 Recall: 0.5588235294117647 F1 Score: 0.5428571428571428
+          None Precision: 0.9038461538461539 Recall: 0.9215686274509803 F1 Score: 0.9126213592233009
