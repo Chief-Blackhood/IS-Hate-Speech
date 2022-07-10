@@ -6,7 +6,7 @@ import numpy as np
 
 import torch
 from torch.utils.data import DataLoader
-from torch import nn
+from torch import nn, tensor
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import wandb
@@ -198,7 +198,8 @@ def main():
     lf_model = LFEmbeddingModule(args, device)
     comment_model = CommentModel(args).to(device)
     if args.multilabel:
-        criterion = nn.BCEWithLogitsLoss().to(device)
+        weights = torch.Tensor([6485/244, 6485/281, 6485/1756, 6485/1452, 6485/2927]).float()
+        criterion = nn.BCEWithLogitsLoss(weight=weights).to(device)
     else:
         criterion = nn.BCELoss().to(device)
 
