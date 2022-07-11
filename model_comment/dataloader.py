@@ -62,5 +62,5 @@ class HateSpeechData(data.Dataset):
             target = torch.FloatTensor(target)
         else:
             label = self.comments['label'][index]
-            target = torch.FloatTensor(label) 
+            target = torch.FloatTensor([label]) 
         return comment, title, desc, transcript, other_comment, target
