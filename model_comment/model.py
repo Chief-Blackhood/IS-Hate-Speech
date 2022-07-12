@@ -63,9 +63,11 @@ class CommentModel(nn.Module):
         else:
             self.fc_size = 1024
         if self.args.multilabel:
+            output_size = 5
+            if self.args.remove_none:
+                output_size = 4
             self.fc = nn.Sequential(
-                nn.Linear(self.fc_size, 5),
-                # nn.Softmax(5)
+                nn.Linear(self.fc_size, output_size),
             )
         else:    
             self.fc = nn.Sequential(

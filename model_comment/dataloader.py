@@ -33,6 +33,8 @@ class HateSpeechData(data.Dataset):
             self.comments = pd.merge(self.comments, self.metadata, how='left', on='url')
         self.comments = self.comments.replace(np.nan, '', regex=True)
         self.comments.drop_duplicates(inplace=True)
+        if self.args.remove_none:
+            self.comments = self.comments[self.comments['label'] == True]
         self.comments = self.comments.reset_index(drop=True)
 
     def load_metadata(self, filename):

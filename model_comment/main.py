@@ -42,6 +42,7 @@ def get_params():
     parser.add_argument("--add_other_comments", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--other_comments_token_count", default=300, type=int, help="number of token to consider of transcript")
     parser.add_argument("--multilabel", default=False, type=ast.literal_eval, help="Flag for multilabel classificaiton")
+    parser.add_argument("--remove_none", default=False, type=ast.literal_eval, help="Flag for removing Non-Hate in multilabel classificaiton")
     
     return parser.parse_args()
     
@@ -198,8 +199,8 @@ def main():
     lf_model = LFEmbeddingModule(args, device)
     comment_model = CommentModel(args).to(device)
     if args.multilabel:
-        weights = torch.Tensor([6485/244, 6485/281, 6485/1756, 6485/1452, 6485/2927]).float()
-        criterion = nn.BCEWithLogitsLoss(weight=weights).to(device)
+        # weights = torch.Tensor([6485/244, 6485/281, 6485/1756, 6485/1452, 6485/2927]).float()
+        criterion = nn.BCEWithLogitsLoss().to(device)
     else:
         criterion = nn.BCELoss().to(device)
 
