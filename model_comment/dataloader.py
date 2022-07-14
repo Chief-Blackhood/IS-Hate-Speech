@@ -57,6 +57,8 @@ class HateSpeechData(data.Dataset):
         other_comment = self.comments['key_phrases_other_comments'][index] if self.args.add_other_comments else ''
         if self.args.multilabel:
             target = np.zeros(5, dtype=float)
+            if self.args.remove_none:
+               target = np.zeros(4, dtype=float) 
             labels = self.comments['target'][index].split(',')
             for label in labels:
                 label = label.strip()
