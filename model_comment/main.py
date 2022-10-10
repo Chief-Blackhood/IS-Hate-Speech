@@ -178,13 +178,13 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, comme
     return losses.avg, acces.avg, preds, labels
 
 
-def load_weights(epoch, lf_model, comment_model, args):
-    lf_checkpoint = os.path.join(args.work_dir, 'lf_model_' + str(epoch)+'.pth.tar')
-    comment_checkpoint = os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar')
+def load_weights(run_name, lf_model, comment_model, args):
+    lf_checkpoint = os.path.join(args.work_dir, 'lf_model_' + str(run_name)+'.pth.tar')
+    comment_checkpoint = os.path.join(args.work_dir, 'comment_model_' + str(run_name)+'.pth.tar')
     
     lf_model.lf_model.load_state_dict(torch.load(lf_checkpoint)['state_dict'])
     comment_model.load_state_dict(torch.load(comment_checkpoint)['state_dict'])
-    return 
+    return lf_model, comment_model
     
 def main():  
     args = get_params()
@@ -196,42 +196,45 @@ def main():
     train_loader = get_data_loaders(args, 'train', ids=np.array([]))
     test_loader = get_data_loaders(args, 'test', ids=np.array([]))
     print('obtained dataloaders')
-
-    lf_model = LFEmbeddingModule(args, device)
-    comment_model = CommentModel(args).to(device)
-    if args.multilabel:
-        # weights = torch.Tensor([6485/244, 6485/281, 6485/1756, 6485/1452, 6485/2927]).float()
-        criterion = nn.BCEWithLogitsLoss().to(device)
-    else:
-        criterion = nn.BCELoss().to(device)
-
-    config = wandb.config
-    config.lr = args.lr
-    wandb.watch(lf_model.lf_model)
-    wandb.watch(comment_model)
-
-    params = []
-    for model in [lf_model.lf_model, comment_model]:
-        params += list(model.parameters())
-
-    optimizer = optim.Adam(params, lr = args.lr)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
-    print('loaded models')
-
-    if not os.path.exists(args.work_dir):
-        os.mkdir(args.work_dir)
-    
     best_eval_acc = 0
     best_eval_loss = np.inf
-    train_acc = 0
-    eval_acc = 0
-    train_loss = 0
-    eval_loss = 0
+    
     ids = np.arange(len(train_loader))
     np.random.shuffle(ids)
     start_id = 0
     chunk_size = len(train_loader)//args.k_folds
+
+    if not os.path.exists(args.work_dir):
+        os.mkdir(args.work_dir)
+
     for fold in range(args.k_folds):
+        lf_model = LFEmbeddingModule(args, device)
+        comment_model = CommentModel(args).to(device)
+        if args.multilabel:
+            # weights = torch.Tensor([6485/244, 6485/281, 6485/1756, 6485/1452, 6485/2927]).float()
+            criterion = nn.BCEWithLogitsLoss().to(device)
+        else:
+            criterion = nn.BCELoss().to(device)
+
+        config = wandb.config
+        config.lr = args.lr
+        wandb.watch(lf_model.lf_model)
+        wandb.watch(comment_model)
+
+        train_acc = 0
+        eval_acc = 0
+        train_loss = 0
+        eval_loss = 0
+
+        params = []
+        for model in [lf_model.lf_model, comment_model]:
+            params += list(model.parameters())
+
+        optimizer = optim.Adam(params, lr = args.lr)
+        scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
+        print('loaded models')
+
+    
         if fold == args.k_folds - 1:
             val_ids = ids[start_id:]
         else:
@@ -293,8 +296,14 @@ def main():
                     'vpm_optimizer': optimizer.state_dict()
                 }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
     
-        
-    #load_weights('best')
+    
+    lf_model = LFEmbeddingModule(args, device)
+    comment_model = CommentModel(args).to(device)
+    lf_model, comment_model = load_weights(run.name, lf_model, comment_model, args)
+    if args.multilabel:
+        criterion = nn.BCEWithLogitsLoss().to(device)
+    else:
+        criterion = nn.BCELoss().to(device)
     test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
     if args.multilabel:
         print('Test: loss {:.4f}'.format(test_loss))

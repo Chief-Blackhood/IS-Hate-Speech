@@ -44,7 +44,6 @@ class HateSpeechData(data.Dataset):
     def load_comments(self, filename, ids):
         df = pd.read_csv(filename)
         df['label'] = df['label'].apply(lambda x: x == 'yes')
-        df.reset_index(inplace=True)
         if ids.size != 0:
             df = df.iloc[ids]
         return df
