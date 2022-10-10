@@ -6,14 +6,14 @@ import numpy as np
 
 class HateSpeechData(data.Dataset):
 
-    def __init__(self, args, phase):
+    def __init__(self, args, phase, ids):
         if args.multilabel:
             self.mapping = {"Organisation": 0, "Location": 1, "Individual": 2, "Community": 3, "None": 4}
         self.args = args
         if phase == 'train':
-            self.comments = self.load_comments(self.args.train_question_file)
+            self.comments = self.load_comments(self.args.train_question_file, ids)
         else:
-            self.comments = self.load_comments(self.args.test_question_file)
+            self.comments = self.load_comments(self.args.test_question_file, ids)
         if args.add_other_comments:
             self.other_comments_data = self.load_metadata(self.args.other_comments_path)
             self.comments = pd.merge(self.comments, self.other_comments_data, how='left', on=['url', 'comment'])
@@ -41,9 +41,12 @@ class HateSpeechData(data.Dataset):
         df = pd.read_csv(filename)
         return df
 
-    def load_comments(self, filename):
+    def load_comments(self, filename, ids):
         df = pd.read_csv(filename)
         df['label'] = df['label'].apply(lambda x: x == 'yes')
+        df.reset_index(inplace=True)
+        if ids.size != 0:
+            df = df.iloc[ids]
         return df
 
     def __len__(self):

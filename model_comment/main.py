@@ -43,6 +43,7 @@ def get_params():
     parser.add_argument("--other_comments_token_count", default=300, type=int, help="number of token to consider of transcript")
     parser.add_argument("--multilabel", default=False, type=ast.literal_eval, help="Flag for multilabel classificaiton")
     parser.add_argument("--remove_none", default=False, type=ast.literal_eval, help="Flag for removing Non-Hate in multilabel classificaiton")
+    parser.add_argument("--k_folds", default=9, type=int, help="number of folds to apply on the training data")
     
     return parser.parse_args()
     
@@ -76,9 +77,9 @@ def save_checkpoint(state, args, name, filename='checkpoint.pth.tar', is_best=Fa
         torch.save(state, best_filename)
         # shutil.copyfile(filename, best_filename)
         
-def get_data_loaders(args, phase):
+def get_data_loaders(args, phase, ids):
     shuffle = True if phase == "train" else False
-    data = HateSpeechData(args, phase)
+    data = HateSpeechData(args, phase, ids)
     dataloader = DataLoader(data, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers)
     return dataloader
 
@@ -192,8 +193,8 @@ def main():
     device = torch.device("cuda")
     print('number of available devices:', torch.cuda.device_count())
 
-    train_loader = get_data_loaders(args, 'train')
-    test_loader = get_data_loaders(args, 'test')
+    train_loader = get_data_loaders(args, 'train', ids=np.array([]))
+    test_loader = get_data_loaders(args, 'test', ids=np.array([]))
     print('obtained dataloaders')
 
     lf_model = LFEmbeddingModule(args, device)
@@ -226,57 +227,71 @@ def main():
     eval_acc = 0
     train_loss = 0
     eval_loss = 0
-    for epoch in range(args.max_epochs):
-        train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterion, optimizer, lf_model, comment_model, args)
-        eval_loss, eval_acc, _, _ = eval_one_epoch(test_loader, epoch, 'Eval', device, criterion, lf_model, comment_model, args)
-        if args.multilabel:
-            print('Epoch-{:<3d} Train: loss {:.4f}\tEval: loss {:.4f}'
-                    .format(epoch, train_loss, eval_loss))
-            wandb.log({'Train Loss': train_loss, 'Eval Loss': eval_loss})
+    ids = np.arange(len(train_loader))
+    np.random.shuffle(ids)
+    start_id = 0
+    chunk_size = len(train_loader)//args.k_folds
+    for fold in range(args.k_folds):
+        if fold == args.k_folds - 1:
+            val_ids = ids[start_id:]
         else:
-            print('Epoch-{:<3d} Train: loss {:.4f}\taccu {:.4f}\tEval: loss {:.4f}\taccu {:.4f}'
-                    .format(epoch, train_loss, train_acc, eval_loss, eval_acc))
-            wandb.log({'Train Loss': train_loss, 'Train Acc': train_acc, 'Eval Loss': eval_loss, 'Eval Acc': eval_acc})
-        scheduler.step(eval_loss)
-        is_better = False
-        if args.multilabel:
-            if eval_loss <= best_eval_loss:
-                best_eval_loss = eval_loss
-                is_better = True
-        else:
-            if eval_acc >= best_eval_acc:
-                best_eval_acc = eval_acc
-                is_better = True
-        
-        if args.multilabel:
-            save_checkpoint({ 'epoch': epoch,
-                'state_dict': lf_model.lf_model.state_dict(),
-                'best_loss': eval_loss,
-                'monitor': 'eval_loss',
-                'optimizer': optimizer.state_dict()
-            }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
-            save_checkpoint({ 'epoch': epoch ,
-                'state_dict': comment_model.state_dict(),
-                'best_loss': eval_loss,
-                'monitor': 'eval_loss',
-                'vpm_optimizer': optimizer.state_dict()
-            }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
+            val_ids = ids[start_id:start_id+chunk_size]
+            start_id += chunk_size
+        train_ids = np.setdiff1d(ids, val_ids)
+        train_loader = get_data_loaders(args, 'train', train_ids)
+        val_loader = get_data_loaders(args, 'train', val_ids)
 
-        else:
-            save_checkpoint({ 'epoch': epoch,
-                'state_dict': lf_model.lf_model.state_dict(),
-                'best_loss': eval_loss,
-                'best_acc' : eval_acc,
-                'monitor': 'eval_acc',
-                'optimizer': optimizer.state_dict()
-            }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
-            save_checkpoint({ 'epoch': epoch ,
-                'state_dict': comment_model.state_dict(),
-                'best_loss': eval_loss,
-                'best_acc' : eval_acc,
-                'monitor': 'eval_acc',
-                'vpm_optimizer': optimizer.state_dict()
-            }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
+        for epoch in range(args.max_epochs):
+            train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterion, optimizer, lf_model, comment_model, args)
+            eval_loss, eval_acc, _, _ = eval_one_epoch(val_loader, epoch, 'Eval', device, criterion, lf_model, comment_model, args)
+            if args.multilabel:
+                print('Epoch-{:<3d} Train: loss {:.4f}\tEval: loss {:.4f}'
+                        .format(epoch, train_loss, eval_loss))
+                wandb.log({'Train Loss': train_loss, 'Eval Loss': eval_loss})
+            else:
+                print('Epoch-{:<3d} Train: loss {:.4f}\taccu {:.4f}\tEval: loss {:.4f}\taccu {:.4f}'
+                        .format(epoch, train_loss, train_acc, eval_loss, eval_acc))
+                wandb.log({'Train Loss': train_loss, 'Train Acc': train_acc, 'Eval Loss': eval_loss, 'Eval Acc': eval_acc})
+            scheduler.step(eval_loss)
+            is_better = False
+            if args.multilabel:
+                if eval_loss <= best_eval_loss:
+                    best_eval_loss = eval_loss
+                    is_better = True
+            else:
+                if eval_acc >= best_eval_acc:
+                    best_eval_acc = eval_acc
+                    is_better = True
+            
+            if args.multilabel:
+                save_checkpoint({ 'epoch': epoch,
+                    'state_dict': lf_model.lf_model.state_dict(),
+                    'best_loss': eval_loss,
+                    'monitor': 'eval_loss',
+                    'optimizer': optimizer.state_dict()
+                }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
+                save_checkpoint({ 'epoch': epoch ,
+                    'state_dict': comment_model.state_dict(),
+                    'best_loss': eval_loss,
+                    'monitor': 'eval_loss',
+                    'vpm_optimizer': optimizer.state_dict()
+                }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
+
+            else:
+                save_checkpoint({ 'epoch': epoch,
+                    'state_dict': lf_model.lf_model.state_dict(),
+                    'best_loss': eval_loss,
+                    'best_acc' : eval_acc,
+                    'monitor': 'eval_acc',
+                    'optimizer': optimizer.state_dict()
+                }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
+                save_checkpoint({ 'epoch': epoch ,
+                    'state_dict': comment_model.state_dict(),
+                    'best_loss': eval_loss,
+                    'best_acc' : eval_acc,
+                    'monitor': 'eval_acc',
+                    'vpm_optimizer': optimizer.state_dict()
+                }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
     
         
     #load_weights('best')
