@@ -318,9 +318,10 @@ def main():
     if args.multilabel:
         for fold in range(args.k_folds):
             lf_model, comment_model = load_weights(run.name, fold, lf_model, comment_model, args)
-            _, _, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
+            _, _, _test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
             test_pred.append(_test_pred)
         test_pred = np.mean(test_pred, axis=0)
+        test_pred = test_pred / np.sum(test_pred, axis=1)
     else:
         for fold in range(args.k_folds):
             lf_model, comment_model = load_weights(run.name, fold, lf_model, comment_model, args)
