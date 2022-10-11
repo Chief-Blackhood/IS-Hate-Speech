@@ -3,6 +3,7 @@
 import argparse
 import os
 import numpy as np
+from scipy.stats import mode
 
 import torch
 from torch.utils.data import DataLoader
@@ -68,11 +69,11 @@ class AverageMeter(object):
 def accuracy(pred, labels):
     return np.sum(pred == labels)/pred.shape[0]
 
-def save_checkpoint(state, args, name, filename='checkpoint.pth.tar', is_best=False):
+def save_checkpoint(state, args, name, fold, filename='checkpoint.pth.tar', is_best=False):
     # torch.save(state, filename)
     if is_best:
-        lf_filename = os.path.join(args.work_dir, 'lf_model_' + str(name) +'.pth.tar')
-        comment_filename = os.path.join(args.work_dir, 'comment_model_' + str(name) +'.pth.tar')
+        lf_filename = os.path.join(args.work_dir, 'lf_model_' + str(name) + f"_{fold}" +'.pth.tar')
+        comment_filename = os.path.join(args.work_dir, 'comment_model_' + str(name) + f"_{fold}" +'.pth.tar')
         best_filename = lf_filename if 'lf_model' in filename else comment_filename
         torch.save(state, best_filename)
         # shutil.copyfile(filename, best_filename)
@@ -178,9 +179,9 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, comme
     return losses.avg, acces.avg, preds, labels
 
 
-def load_weights(run_name, lf_model, comment_model, args):
-    lf_checkpoint = os.path.join(args.work_dir, 'lf_model_' + str(run_name)+'.pth.tar')
-    comment_checkpoint = os.path.join(args.work_dir, 'comment_model_' + str(run_name)+'.pth.tar')
+def load_weights(run_name, fold, lf_model, comment_model, args):
+    lf_checkpoint = os.path.join(args.work_dir, 'lf_model_' + str(run_name) + f"_{fold}" +'.pth.tar')    
+    comment_checkpoint = os.path.join(args.work_dir, 'comment_model_' + str(run_name) + f"_{fold}" + '.pth.tar')
     
     lf_model.lf_model.load_state_dict(torch.load(lf_checkpoint)['state_dict'])
     comment_model.load_state_dict(torch.load(comment_checkpoint)['state_dict'])
@@ -196,8 +197,6 @@ def main():
     train_loader = get_data_loaders(args, 'train', ids=np.array([]))
     test_loader = get_data_loaders(args, 'test', ids=np.array([]))
     print('obtained dataloaders')
-    best_eval_acc = 0
-    best_eval_loss = np.inf
     
     ids = np.arange(len(train_loader))
     np.random.shuffle(ids)
@@ -206,6 +205,9 @@ def main():
 
     if not os.path.exists(args.work_dir):
         os.mkdir(args.work_dir)
+
+    fold_val_accuracies = []
+    fold_val_losses = []
 
     for fold in range(args.k_folds):
         lf_model = LFEmbeddingModule(args, device)
@@ -225,6 +227,8 @@ def main():
         eval_acc = 0
         train_loss = 0
         eval_loss = 0
+        best_eval_acc = 0
+        best_eval_loss = np.inf
 
         params = []
         for model in [lf_model.lf_model, comment_model]:
@@ -272,13 +276,13 @@ def main():
                     'best_loss': eval_loss,
                     'monitor': 'eval_loss',
                     'optimizer': optimizer.state_dict()
-                }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
+                }, args, run.name, fold, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
                 save_checkpoint({ 'epoch': epoch ,
                     'state_dict': comment_model.state_dict(),
                     'best_loss': eval_loss,
                     'monitor': 'eval_loss',
                     'vpm_optimizer': optimizer.state_dict()
-                }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
+                }, args, run.name, fold, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
 
             else:
                 save_checkpoint({ 'epoch': epoch,
@@ -287,28 +291,49 @@ def main():
                     'best_acc' : eval_acc,
                     'monitor': 'eval_acc',
                     'optimizer': optimizer.state_dict()
-                }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
+                }, args, run.name, fold, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
                 save_checkpoint({ 'epoch': epoch ,
                     'state_dict': comment_model.state_dict(),
                     'best_loss': eval_loss,
                     'best_acc' : eval_acc,
                     'monitor': 'eval_acc',
                     'vpm_optimizer': optimizer.state_dict()
-                }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
+                }, args, run.name, fold, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
+        
+        fold_val_accuracies.append(best_eval_acc)
+        fold_val_losses.append(best_eval_loss)
+
+    print('Final K-Fold Eval: loss {:.4f}\taccu {:.4f}'
+                    .format(np.mean(best_eval_acc), np.mean(best_eval_loss)))
     
-    
+
     lf_model = LFEmbeddingModule(args, device)
     comment_model = CommentModel(args).to(device)
-    lf_model, comment_model = load_weights(run.name, lf_model, comment_model, args)
     if args.multilabel:
         criterion = nn.BCEWithLogitsLoss().to(device)
     else:
         criterion = nn.BCELoss().to(device)
-    test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
+    
+    test_pred = []
     if args.multilabel:
-        print('Test: loss {:.4f}'.format(test_loss))
+        for fold in range(args.k_folds):
+            lf_model, comment_model = load_weights(run.name, fold, lf_model, comment_model, args)
+            _, _, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
+            test_pred.append(_test_pred)
+        test_pred = np.mean(test_pred, axis=0)
     else:
-        print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
+        for fold in range(args.k_folds):
+            lf_model, comment_model = load_weights(run.name, fold, lf_model, comment_model, args)
+            _, _, _test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
+            test_pred.append(_test_pred)
+        test_pred = mode(np.array(test_pred), axis=0)[0][0]
+        test_acc = accuracy(test_pred, test_label)
+
+    if args.multilabel:
+        pass
+    else:
+        print('Test: accu {:.4f}'.format(test_acc))
+
     np.save(f'{args.work_dir}/test_preds_{run.name}.npy', np.array(test_pred))
     np.save(f'{args.work_dir}/test_labels_{run.name}.npy', np.array(test_label))
 
