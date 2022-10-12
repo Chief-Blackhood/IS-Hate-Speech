@@ -4,10 +4,11 @@ import argparse
 import os
 import numpy as np
 from scipy.stats import mode
+import pandas as pd
 
 import torch
 from torch.utils.data import DataLoader
-from torch import nn, tensor
+from torch import nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import wandb
@@ -44,7 +45,7 @@ def get_params():
     parser.add_argument("--other_comments_token_count", default=300, type=int, help="number of token to consider of transcript")
     parser.add_argument("--multilabel", default=False, type=ast.literal_eval, help="Flag for multilabel classificaiton")
     parser.add_argument("--remove_none", default=False, type=ast.literal_eval, help="Flag for removing Non-Hate in multilabel classificaiton")
-    parser.add_argument("--k_folds", default=9, type=int, help="number of folds to apply on the training data")
+    parser.add_argument("--k_folds", default=10, type=int, help="number of folds to apply on the training data")
     
     return parser.parse_args()
     
@@ -197,11 +198,11 @@ def main():
     train_loader = get_data_loaders(args, 'train', ids=np.array([]))
     test_loader = get_data_loaders(args, 'test', ids=np.array([]))
     print('obtained dataloaders')
-    
-    ids = np.arange(len(train_loader))
+    df = pd.read_csv(args.train_question_file)
+    ids = np.arange(len(df))
     np.random.shuffle(ids)
     start_id = 0
-    chunk_size = len(train_loader)//args.k_folds
+    chunk_size = len(df)//args.k_folds
 
     if not os.path.exists(args.work_dir):
         os.mkdir(args.work_dir)
