@@ -50,7 +50,7 @@ class HateSpeechData(data.Dataset):
         return len(self.comments)
 
     def __getitem__(self, index):
-        comment = self.comments['comment'][index]
+        comment = self.comments['comment'][index] if self.args.add_comment else ''
         title = self.comments['title'][index] if self.args.add_title else ''
         desc = self.comments['desc'][index] if self.args.add_description else ''
         transcript = self.comments['transcript'][index] if self.args.add_transcription else ''

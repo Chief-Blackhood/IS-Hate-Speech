@@ -30,6 +30,7 @@ def get_params():
     parser.add_argument("--freeze_lf_layers", default=23, type=int, help='number of layers to freeze in BERT or LF')
     parser.add_argument("--metadata_path", default='data/extra_data_trans.csv', type=str, help='metadata for a video')
     parser.add_argument("--pad_metadata", default=True, type=ast.literal_eval, help="need to pad metadata")
+    parser.add_argument("--add_comment", default=True, type=ast.literal_eval, help="add original comment")
     parser.add_argument("--add_title", default=False, type=ast.literal_eval, help="add title as context")
     parser.add_argument("--title_token_count", default=50, type=int, help="token to consider of title")
     parser.add_argument("--add_description", default=False, type=ast.literal_eval, help="add description as context")
