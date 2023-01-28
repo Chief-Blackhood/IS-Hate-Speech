@@ -12,6 +12,8 @@ class HateSpeechData(data.Dataset):
         self.args = args
         if phase == 'train':
             self.comments = self.load_comments(self.args.train_question_file)
+        elif phase == 'validation':
+            self.comments = self.load_comments(self.args.validation_question_file)
         else:
             self.comments = self.load_comments(self.args.test_question_file)
         if args.add_other_comments:

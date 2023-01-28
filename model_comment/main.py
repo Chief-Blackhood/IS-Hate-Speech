@@ -18,8 +18,9 @@ from model import LFEmbeddingModule, CommentModel
 def get_params():
     parser = argparse.ArgumentParser()
     parser.add_argument("--work_dir", default = 'model_comment/', type = str, help='location of all the train and model files located')
-    parser.add_argument("--train_question_file", default='data/with_aug/train.csv', type=str, help='train data')
-    parser.add_argument("--test_question_file", default='data/with_aug/test.csv', type=str, help='test data')
+    parser.add_argument("--train_question_file", default='data/with_aug_ttv/train.csv', type=str, help='train data')
+    parser.add_argument("--validation_question_file", default='data/with_aug_ttv/validation.csv', type=str, help='validation data')
+    parser.add_argument("--test_question_file", default='data/with_aug_ttv/test.csv', type=str, help='test data')
     parser.add_argument("--batch_size", default=8, type=int, help='batch size')
     parser.add_argument("--model", default='bert-large-cased', choices=['bert-large-cased', 'bert-base-cased', 'allenai/longformer-base-4096', 'allenai/longformer-large-4096'], type=str, help='which model to try from bert-large, bert-base and longformer')
     parser.add_argument("--lr", default=0.0003, type=float, help='learning rate')
@@ -64,6 +65,23 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
+
+class EarlyStopper:
+    def __init__(self, patience=1, min_delta=0):
+        self.patience = patience
+        self.min_delta = min_delta
+        self.counter = 0
+        self.min_validation_loss = np.inf
+
+    def early_stop(self, validation_loss):
+        if validation_loss < self.min_validation_loss:
+            self.min_validation_loss = validation_loss
+            self.counter = 0
+        elif validation_loss > (self.min_validation_loss + self.min_delta):
+            self.counter += 1
+            if self.counter >= self.patience:
+                return True
+        return False
 
 def accuracy(pred, labels):
     return np.sum(pred == labels)/pred.shape[0]
@@ -188,12 +206,13 @@ def load_weights(epoch, lf_model, comment_model, args):
     
 def main():  
     args = get_params()
-    run = wandb.init(project='final_models', entity='is_project')
+    run = wandb.init(project="23Jan_runs", entity='is_project')
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     device = torch.device("cuda")
     print('number of available devices:', torch.cuda.device_count())
 
     train_loader = get_data_loaders(args, 'train')
+    validation_loader = get_data_loaders(args, 'validation')
     test_loader = get_data_loaders(args, 'test')
     print('obtained dataloaders')
 
@@ -216,6 +235,7 @@ def main():
 
     optimizer = optim.Adam(params, lr = args.lr)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
+    early_stopper = EarlyStopper(patience=5, min_delta=0.01)
     print('loaded models')
 
     if not os.path.exists(args.work_dir):
@@ -229,7 +249,7 @@ def main():
     eval_loss = 0
     for epoch in range(args.max_epochs):
         train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterion, optimizer, lf_model, comment_model, args)
-        eval_loss, eval_acc, _, _ = eval_one_epoch(test_loader, epoch, 'Eval', device, criterion, lf_model, comment_model, args)
+        eval_loss, eval_acc, _, _ = eval_one_epoch(validation_loader, epoch, 'Eval', device, criterion, lf_model, comment_model, args)
         if args.multilabel:
             print('Epoch-{:<3d} Train: loss {:.4f}\tEval: loss {:.4f}'
                     .format(epoch, train_loss, eval_loss))
@@ -278,6 +298,10 @@ def main():
                 'monitor': 'eval_acc',
                 'vpm_optimizer': optimizer.state_dict()
             }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
+        
+        # Early stopping
+        # if early_stopper.early_stop(eval_loss):             
+        #     break
     
         
     #load_weights('best')
