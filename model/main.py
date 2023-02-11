@@ -6,14 +6,14 @@ import numpy as np
 
 import torch
 from torch.utils.data import DataLoader
-from torch import nn, tensor
+from torch import nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import wandb
 import ast
 
 from dataloader import HateSpeechData
-from model import LFEmbeddingModule, CommentModel
+from model import LFEmbeddingModule, VisionModule, CommentModel
 
 def get_params():
     parser = argparse.ArgumentParser()
@@ -43,8 +43,10 @@ def get_params():
     parser.add_argument("--other_comments_path", default='data/extra_data_other_comments.csv', type=str, help='other comments data for a video')
     parser.add_argument("--add_other_comments", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--other_comments_token_count", default=300, type=int, help="number of token to consider of transcript")
+    parser.add_argument("--add_video", default=False, type=ast.literal_eval, help="add video as context")
+    parser.add_argument("--video_path", default='data/videos/', type=str, help='directory which contains videos')
     parser.add_argument("--multilabel", default=False, type=ast.literal_eval, help="Flag for multilabel classificaiton")
-    parser.add_argument("--remove_none", default=False, type=ast.literal_eval, help="Flag for removing Non-Hate in multilabel classificaiton")
+    parser.add_argument("--remove_none", default=False, type=ast.literal_eval, help="Flag for removing Non-Hate in multilabel classification")
     
     return parser.parse_args()
     
@@ -101,17 +103,19 @@ def get_data_loaders(args, phase):
     dataloader = DataLoader(data, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers)
     return dataloader
 
-def train_one_epoch(train_loader, epoch, phase, device, criterion, optimizer, lf_model, comment_model, args):
+def train_one_epoch(train_loader, epoch, phase, device, criterion, optimizer, lf_model, vision_model, comment_model, args):
     
     lf_model.lf_model.train()
+    vision_model.model.eval()
     comment_model.train()
+
     
     losses = AverageMeter()
     acces = AverageMeter()
-    for itr, (comment, title, description, transcription, other_comments, label) in enumerate(train_loader):
+    for itr, (comment, title, description, transcription, other_comments, frames, label) in enumerate(train_loader):
         label = label.to(device)
 
-        output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1])
+        output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vision_model.get_embeddings(frames))
 
         loss = criterion(output, label)        
         
@@ -146,8 +150,10 @@ def train_one_epoch(train_loader, epoch, phase, device, criterion, optimizer, lf
         return losses.avg, None   
     return losses.avg, acces.avg
         
-def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, comment_model, args):
+def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, vision_model, comment_model, args):
+
     lf_model.lf_model.eval()
+    vision_model.model.eval()
     comment_model.eval()
 
     losses = AverageMeter()
@@ -156,10 +162,10 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, comme
     preds = []
     labels = []
     with torch.no_grad():
-        for itr, (comment, title, description, transcription, other_comments, label) in enumerate(test_loader):
+        for itr, (comment, title, description, transcription, other_comments, frames, label) in enumerate(test_loader):
             label = label.to(device)
 
-            output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1])
+            output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vision_model.get_embeddings(frames))
 
             loss = criterion(output, label)
 
@@ -217,6 +223,7 @@ def main():
     print('obtained dataloaders')
 
     lf_model = LFEmbeddingModule(args, device)
+    vision_model = VisionModule(args, device)
     comment_model = CommentModel(args).to(device)
     if args.multilabel:
         # weights = torch.Tensor([6485/244, 6485/281, 6485/1756, 6485/1452, 6485/2927]).float()
@@ -235,7 +242,6 @@ def main():
 
     optimizer = optim.Adam(params, lr = args.lr)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
-    early_stopper = EarlyStopper(patience=5, min_delta=0.01)
     print('loaded models')
 
     if not os.path.exists(args.work_dir):
@@ -248,8 +254,8 @@ def main():
     train_loss = 0
     eval_loss = 0
     for epoch in range(args.max_epochs):
-        train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterion, optimizer, lf_model, comment_model, args)
-        eval_loss, eval_acc, _, _ = eval_one_epoch(validation_loader, epoch, 'Eval', device, criterion, lf_model, comment_model, args)
+        train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterion, optimizer, lf_model, vision_model, comment_model, args)
+        eval_loss, eval_acc, _, _ = eval_one_epoch(validation_loader, epoch, 'Eval', device, criterion, lf_model, vision_model, comment_model, args)
         if args.multilabel:
             print('Epoch-{:<3d} Train: loss {:.4f}\tEval: loss {:.4f}'
                     .format(epoch, train_loss, eval_loss))
@@ -298,11 +304,6 @@ def main():
                 'monitor': 'eval_acc',
                 'vpm_optimizer': optimizer.state_dict()
             }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
-        
-        # Early stopping
-        # if early_stopper.early_stop(eval_loss):             
-        #     break
-    
         
     #load_weights('best')
     test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)

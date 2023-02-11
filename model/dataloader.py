@@ -1,8 +1,23 @@
+import os
+
 import torch
 import torch.utils.data as data
 import pandas as pd
 import numpy as np
 
+from pytorchvideo.data.encoded_video import EncodedVideo
+
+from torchvision.transforms import Compose, Lambda, Resize
+from torchvision.transforms._transforms_video import (
+    CenterCropVideo,
+    NormalizeVideo
+)
+from pytorchvideo.transforms import (
+    ApplyTransformToKey,
+    UniformTemporalSubsample
+)
+
+from config import *
 
 class HateSpeechData(data.Dataset):
 
@@ -16,6 +31,23 @@ class HateSpeechData(data.Dataset):
             self.comments = self.load_comments(self.args.validation_question_file)
         else:
             self.comments = self.load_comments(self.args.test_question_file)
+
+        self.comments[['videoID', 'source']] = self.comments['url'].apply(lambda x: self.parse_urls(x))
+        
+        if args.add_video:
+            self.transform = ApplyTransformToKey(
+                key="video",
+                transform=Compose(
+                    [
+                        UniformTemporalSubsample(NUM_FRAMES),
+                        Resize(RESIZE),
+                        CenterCropVideo(crop_size=(CROP_SIZE, CROP_SIZE)),
+                        Lambda(lambda x: x / 255.0),
+                        NormalizeVideo(MEAN, STD)
+                    ]
+                ),
+            )
+
         if args.add_other_comments:
             self.other_comments_data = self.load_metadata(self.args.other_comments_path)
             self.comments = pd.merge(self.comments, self.other_comments_data, how='left', on=['url', 'comment'])
@@ -42,6 +74,20 @@ class HateSpeechData(data.Dataset):
     def load_metadata(self, filename):
         df = pd.read_csv(filename)
         return df
+    
+    def parse_urls(self, url):
+        videoID = ""
+        source = ""
+        if "youtube" in url:
+            source = "youtube"
+            videoID = url.split("watch?v=")[1].split("_channel=")[0].split("&t=")[0].split("&lc=")[0]
+            assert len(videoID) == 11
+
+        elif "bitchute" in url:
+            source = "bitchute"
+            videoID = url.split("video/")[1][-1]
+    
+        return videoID, source
 
     def load_comments(self, filename):
         df = pd.read_csv(filename)
@@ -57,6 +103,14 @@ class HateSpeechData(data.Dataset):
         desc = self.comments['desc'][index] if self.args.add_description else ''
         transcript = self.comments['transcript'][index] if self.args.add_transcription else ''
         other_comment = self.comments['key_phrases_other_comments'][index] if self.args.add_other_comments else ''
+
+        frame_data = torch.zeros(3, NUM_FRAMES, CROP_SIZE, CROP_SIZE)
+        if self.args.add_video:
+            video = EncodedVideo.from_path(f"{os.path.join(self.args.video_path, self.comments['source'][index], self.comments['videoId'][index])}")
+            video_data = video.get_clip(start_sec=0, end_sec=int(video.duration))
+            video_data = self.transform(video_data)
+            frame_data = video_data["video"]
+            
         if self.args.multilabel:
             target = np.zeros(5, dtype=float)
             if self.args.remove_none:
@@ -69,4 +123,4 @@ class HateSpeechData(data.Dataset):
         else:
             label = self.comments['label'][index]
             target = torch.FloatTensor([label]) 
-        return comment, title, desc, transcript, other_comment, target
+        return comment, title, desc, transcript, other_comment, frame_data, target

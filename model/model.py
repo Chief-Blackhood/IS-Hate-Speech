@@ -1,10 +1,8 @@
-from operator import index
-from numpy import pad
 import torch
 from torch import nn
+import torchvision
 from transformers import LongformerModel, LongformerTokenizer
 from transformers import BertTokenizer, BertModel
-
 
 class LFEmbeddingModule(nn.Module):
     def __init__(self, args, device):
@@ -33,7 +31,6 @@ class LFEmbeddingModule(nn.Module):
         max_len_other_comments = self.args.other_comments_token_count
         padding = 'max_length' if self.args.pad_metadata else False
         for comment, title, desc, transcript, other_comment in zip(comments, titles, descriptions, transcripts, other_comments):
-            
             enc_c = []
             if self.args.add_comment:
                 enc_c = self.lf_tokenizer.encode_plus(comment, max_length=max_len_total, padding=False, truncation=True)['input_ids']
@@ -67,7 +64,25 @@ class LFEmbeddingModule(nn.Module):
         indexed_cs = torch.tensor(indexed_cs).to(self.device)
         embedding = self.lf_model(indexed_cs)
         return embedding
-    
+
+class VisionModule(nn.Module):
+    def __init__(self, args, device):
+        super(VisionModule, self).__init__()
+        self.args = args
+        self.device = device
+        pretrained_model = torchvision.models.video.r3d_18(pretrained=True)
+        self.model = torch.nn.Sequential(*(list(pretrained_model.children())[:-1])).to(device)
+        for param in self.model.parameters():
+            param.requires_grad = False
+
+    def get_embeddings(self, frames):
+        frames = frames.to(self.device)
+        vision_embedding = self.model(frames)
+        vision_embedding = vision_embedding.squeeze()
+        print(vision_embedding.shape)
+        return vision_embedding
+
+        
 class CommentModel(nn.Module):
     def __init__(self, args):
         super(CommentModel, self).__init__()
@@ -76,6 +91,8 @@ class CommentModel(nn.Module):
             self.fc_size = 768
         else:
             self.fc_size = 1024
+        if self.args.add_video:
+            self.fc_size += 512
         if self.args.multilabel:
             output_size = 5
             if self.args.remove_none:
@@ -89,6 +106,10 @@ class CommentModel(nn.Module):
                 nn.Sigmoid()
             )
 
-    def forward(self, text_emb):
-        out = self.fc(text_emb)
+    def forward(self, text_emb, vision_emb):
+        if self.args.add_video:
+            fin_emb = torch.cat([text_emb, vision_emb], dim = 1)
+            out = self.fc(fin_emb)
+        else:
+            out = self.fc(text_emb)
         return out
