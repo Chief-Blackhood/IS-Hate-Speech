@@ -78,8 +78,8 @@ class VisionModule(nn.Module):
     def get_embeddings(self, frames):
         frames = frames.to(self.device)
         vision_embedding = self.model(frames)
-        vision_embedding = vision_embedding.squeeze()
-        print(vision_embedding.shape)
+        # vision_embedding = vision_embedding.squeeze()
+        vision_embedding = torch.flatten(vision_embedding, start_dim=1)
         return vision_embedding
 
         

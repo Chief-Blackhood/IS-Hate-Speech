@@ -212,7 +212,7 @@ def load_weights(epoch, lf_model, comment_model, args):
     
 def main():  
     args = get_params()
-    run = wandb.init(project="23Jan_runs", entity='is_project')
+    run = wandb.init(project="vision_models", entity='is_project')
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     device = torch.device("cuda")
     print('number of available devices:', torch.cuda.device_count())
@@ -306,7 +306,7 @@ def main():
             }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
         
     #load_weights('best')
-    test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, comment_model, args)
+    test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, vision_model, comment_model, args)
     if args.multilabel:
         print('Test: loss {:.4f}'.format(test_loss))
     else:
