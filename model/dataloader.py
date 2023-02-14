@@ -11,18 +11,6 @@ from opencv_transforms.transforms import (
 
 import cv2
 
-# from pytorchvideo.data.encoded_video import EncodedVideo
-
-# from torchvision.transforms import Compose, Lambda, Resize
-# from torchvision.transforms._transforms_video import (
-#     CenterCropVideo,
-#     NormalizeVideo
-# )
-# from pytorchvideo.transforms import (
-#     ApplyTransformToKey,
-#     UniformTemporalSubsample
-# )
-
 from config import *
 
 class HateSpeechData(data.Dataset):
@@ -41,23 +29,10 @@ class HateSpeechData(data.Dataset):
         self.comments[['videoID', 'source']] = self.comments['url'].apply(lambda x: self.parse_urls(x))
         
         if args.add_video:
-            # self.transform = ApplyTransformToKey(
-            #     key="video",
-            #     transform=Compose(
-            #         [
-            #             UniformTemporalSubsample(NUM_FRAMES),
-            #             Resize(RESIZE),
-            #             CenterCropVideo(crop_size=CROP_SIZE),
-            #             Lambda(lambda x: x / 255.0),
-            #             NormalizeVideo(MEAN, STD)
-            #         ]
-            #     ),
-            # )
             self.transform = Compose(
                 [
                     Resize(RESIZE),
                     CenterCrop(CROP_SIZE),
-                    # Lambda(lambda x: x / 255.0),
                     ToTensor(),
                     Normalize(MEAN, STD)
                 ]
@@ -104,7 +79,6 @@ class HateSpeechData(data.Dataset):
             source = "bitchute"
             videoID = url.split("/")[-2]
     
-        # return videoID, source
         return  pd.Series({'videoID': videoID, 'source': source})
 
     def load_comments(self, filename):
@@ -122,35 +96,38 @@ class HateSpeechData(data.Dataset):
         transcript = self.comments['transcript'][index] if self.args.add_transcription else ''
         other_comment = self.comments['key_phrases_other_comments'][index] if self.args.add_other_comments else ''
 
-        frame_data = torch.zeros(3, NUM_FRAMES, CROP_SIZE, CROP_SIZE)
+        frame_data = torch.zeros(NCHANNELS, 1, CROP_SIZE, CROP_SIZE)
         if self.args.add_video:
             frame_data = []
             filename = os.path.join(self.args.video_path, self.comments['source'][index], self.comments['videoID'][index])
             vidcap = cv2.VideoCapture(f"{filename}.mp4")
-            total_frames = vidcap.get(cv2.CAP_PROP_FRAME_COUNT)
-            frames_step = total_frames // NUM_FRAMES
-            for i in range(NUM_FRAMES):
-                vidcap.set(1, i * frames_step)
+            # total_frames = vidcap.get(cv2.CAP_PROP_FRAME_COUNT)
+            frame_rate = vidcap.get(cv2.CAP_PROP_FPS)
+            frames_step = frame_rate * NTH_SECOND
+            # frames_step = total_frames // NUM_FRAMES
+            # for i in range(NUM_FRAMES):
+            #     vidcap.set(1, i * frames_step)
+            #     ret, image = vidcap.read()
+            #     if ret:
+            #         image = self.transform(image)
+            #         image = image[None, ...]
+            #         frame_data.append(image)
+
+            num_frames = 0
+            while vidcap.isOpened():
                 ret, image = vidcap.read()
                 if ret:
                     image = self.transform(image)
                     image = image[None, ...]
                     frame_data.append(image)
+                    num_frames += 1
+                    vidcap.set(cv2.CAP_PROP_POS_FRAMES, num_frames * frames_step)
+                else:
+                    vidcap.release()
+                    break
 
-            vidcap.release()
-            try:
-                frame_data = torch.cat(frame_data)
-            except:
-                print("Error 1: ", comment, frame_data, self.comments['source'][index], self.comments['videoID'][index], filename, total_frames, frames_step)
-            
-            try:
-                frame_data = frame_data.reshape((3, NUM_FRAMES, CROP_SIZE, CROP_SIZE))
-            except:
-                print("Error 2: ", comment, frame_data.shape)
-            # video = EncodedVideo.from_path(f"{filename}.mp4")
-            # video_data = video.get_clip(start_sec=0, end_sec=int(video.duration))
-            # video_data = self.transform(video_data)
-            # frame_data = video_data["video"]
+            frame_data = torch.cat(frame_data)
+            frame_data = frame_data.reshape((NCHANNELS, num_frames, CROP_SIZE, CROP_SIZE))
             
         if self.args.multilabel:
             target = np.zeros(5, dtype=float)

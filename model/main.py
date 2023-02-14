@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from torch import nn
+import torch.nn.functional as F
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import wandb
@@ -96,11 +97,20 @@ def save_checkpoint(state, args, name, filename='checkpoint.pth.tar', is_best=Fa
         best_filename = lf_filename if 'lf_model' in filename else comment_filename
         torch.save(state, best_filename)
         # shutil.copyfile(filename, best_filename)
-        
+
+def collate_fn(batch):
+    comments, titles, descriptions, transcriptions, other_comments, frames, labels = zip(*batch)
+
+    max_frames = max([image.size(1) for image in frames])
+    frames = torch.tensor(np.array([F.pad(image, [0, 0, 0, 0, 0, max_frames - image.size(1)]).numpy() for image in frames]))
+    labels = torch.tensor(labels).reshape(-1, 1)
+    return [comments, titles, descriptions, transcriptions, other_comments, frames, labels]
+
+
 def get_data_loaders(args, phase):
     shuffle = True if phase == "train" else False
     data = HateSpeechData(args, phase)
-    dataloader = DataLoader(data, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers)
+    dataloader = DataLoader(data, collate_fn=collate_fn, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers)
     return dataloader
 
 def train_one_epoch(train_loader, epoch, phase, device, criterion, optimizer, lf_model, vision_model, comment_model, args):
@@ -115,7 +125,11 @@ def train_one_epoch(train_loader, epoch, phase, device, criterion, optimizer, lf
     for itr, (comment, title, description, transcription, other_comments, frames, label) in enumerate(train_loader):
         label = label.to(device)
 
-        output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vision_model.get_embeddings(frames))
+        vis_emb = None
+        if args.add_video:
+            vis_emb = vision_model.get_embeddings(frames)
+        
+        output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vis_emb)
 
         loss = criterion(output, label)        
         
@@ -165,7 +179,11 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, visio
         for itr, (comment, title, description, transcription, other_comments, frames, label) in enumerate(test_loader):
             label = label.to(device)
 
-            output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vision_model.get_embeddings(frames))
+            vis_emb = None
+            if args.add_video:
+                vis_emb = vision_model.get_embeddings(frames)
+
+            output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vis_emb)
 
             loss = criterion(output, label)
 
