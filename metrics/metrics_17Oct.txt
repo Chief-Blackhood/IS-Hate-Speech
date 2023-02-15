@@ -1,0 +1,140 @@
+
+The metrics for absurd-bush-78 run are:
+absurd-bush-78
+     Precision: 0.5121951219512195
+     Precision for (Non Hate): 1.0
+     Recall: 1.0
+     Recall for (Non Hate): 0.0196078431372549
+     F1 score: 0.6774193548387097
+     F1 score for (Non Hate): 0.038461538461538464
+     Accuracy: 0.5169082125603864
+
+The metrics for avid-brook-87 run are:
+avid-brook-87
+     Precision: 0.941747572815534
+     Precision for (Non Hate): 0.9230769230769231
+     Recall: 0.9238095238095239
+     Recall for (Non Hate): 0.9411764705882353
+     F1 score: 0.9326923076923078
+     F1 score for (Non Hate): 0.9320388349514563
+     Accuracy: 0.9323671497584541
+
+The metrics for breezy-wood-86 run are:
+breezy-wood-86
+     Precision: 0.9333333333333333
+     Precision for (Non Hate): 0.9313725490196079
+     Recall: 0.9333333333333333
+     Recall for (Non Hate): 0.9313725490196079
+     F1 score: 0.9333333333333333
+     F1 score for (Non Hate): 0.9313725490196079
+     Accuracy: 0.9323671497584541
+
+The metrics for cosmic-snowball-82 run are:
+cosmic-snowball-82
+     Precision: 0.8990825688073395
+     Precision for (Non Hate): 0.9285714285714286
+     Recall: 0.9333333333333333
+     Recall for (Non Hate): 0.8921568627450981
+     F1 score: 0.9158878504672897
+     F1 score for (Non Hate): 0.9099999999999999
+     Accuracy: 0.9130434782608695
+
+The metrics for dark-fire-84 run are:
+dark-fire-84
+     Precision: 0.9411764705882353
+     Precision for (Non Hate): 0.9142857142857143
+     Recall: 0.9142857142857143
+     Recall for (Non Hate): 0.9411764705882353
+     F1 score: 0.9275362318840579
+     F1 score for (Non Hate): 0.9275362318840579
+     Accuracy: 0.927536231884058
+
+The metrics for dauntless-star-80 run are:
+dauntless-star-80
+     Precision: 0.753731343283582
+     Precision for (Non Hate): 0.9452054794520548
+     Recall: 0.9619047619047619
+     Recall for (Non Hate): 0.6764705882352942
+     F1 score: 0.8451882845188284
+     F1 score for (Non Hate): 0.7885714285714286
+     Accuracy: 0.821256038647343
+
+The metrics for ethereal-spaceship-91 run are:
+ethereal-spaceship-91
+     Precision: 0.9326923076923077
+     Precision for (Non Hate): 0.9223300970873787
+     Recall: 0.9238095238095239
+     Recall for (Non Hate): 0.9313725490196079
+     F1 score: 0.9282296650717704
+     F1 score for (Non Hate): 0.9268292682926829
+     Accuracy: 0.927536231884058
+
+The metrics for floral-shadow-88 run are:
+floral-shadow-88
+     Precision: 0.9245283018867925
+     Precision for (Non Hate): 0.9306930693069307
+     Recall: 0.9333333333333333
+     Recall for (Non Hate): 0.9215686274509803
+     F1 score: 0.9289099526066351
+     F1 score for (Non Hate): 0.9261083743842364
+     Accuracy: 0.927536231884058
+
+The metrics for laced-fire-79 run are:
+laced-fire-79
+     Precision: 0.9320388349514563
+     Precision for (Non Hate): 0.9134615384615384
+     Recall: 0.9142857142857143
+     Recall for (Non Hate): 0.9313725490196079
+     F1 score: 0.9230769230769231
+     F1 score for (Non Hate): 0.9223300970873786
+     Accuracy: 0.9227053140096618
+
+The metrics for playful-tree-85 run are:
+playful-tree-85
+     Precision: 0.9423076923076923
+     Precision for (Non Hate): 0.9320388349514563
+     Recall: 0.9333333333333333
+     Recall for (Non Hate): 0.9411764705882353
+     F1 score: 0.937799043062201
+     F1 score for (Non Hate): 0.9365853658536586
+     Accuracy: 0.9371980676328503
+
+The metrics for prime-star-89 run are:
+prime-star-89
+     Precision: 0.9245283018867925
+     Precision for (Non Hate): 0.9306930693069307
+     Recall: 0.9333333333333333
+     Recall for (Non Hate): 0.9215686274509803
+     F1 score: 0.9289099526066351
+     F1 score for (Non Hate): 0.9261083743842364
+     Accuracy: 0.927536231884058
+
+The metrics for ruby-feather-83 run are:
+ruby-feather-83
+     Precision: 0.9326923076923077
+     Precision for (Non Hate): 0.9223300970873787
+     Recall: 0.9238095238095239
+     Recall for (Non Hate): 0.9313725490196079
+     F1 score: 0.9282296650717704
+     F1 score for (Non Hate): 0.9268292682926829
+     Accuracy: 0.927536231884058
+
+The metrics for upbeat-cherry-81 run are:
+upbeat-cherry-81
+     Precision: 0.8828828828828829
+     Precision for (Non Hate): 0.9270833333333334
+     Recall: 0.9333333333333333
+     Recall for (Non Hate): 0.8725490196078431
+     F1 score: 0.9074074074074073
+     F1 score for (Non Hate): 0.898989898989899
+     Accuracy: 0.9033816425120773
+
+The metrics for woven-haze-90 run are:
+woven-haze-90
+     Precision: 0.8623853211009175
+     Precision for (Non Hate): 0.8877551020408163
+     Recall: 0.8952380952380953
+     Recall for (Non Hate): 0.8529411764705882
+     F1 score: 0.8785046728971964
+     F1 score for (Non Hate): 0.87
+     Accuracy: 0.8743961352657005

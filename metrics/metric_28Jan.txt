@@ -1,0 +1,160 @@
+
+The metrics for abundant-snake-1 run are: Comment
+abundant-snake-1
+     Precision: 0.6842105263157895
+     Precision for (Non Hate): 0.4221105527638191
+     Recall: 0.1015625
+     Recall for (Non Hate): 0.9333333333333333
+     F1 score: 0.17687074829931973
+     F1 score for (Non Hate): 0.5813148788927336
+     Accuracy: 0.44495412844036697
+
+The metrics for virtuous-dumpling-4 run are: Title
+virtuous-dumpling-4
+     Precision: 0.7380952380952381
+     Precision for (Non Hate): 0.6195652173913043
+     Recall: 0.7265625
+     Recall for (Non Hate): 0.6333333333333333
+     F1 score: 0.7322834645669293
+     F1 score for (Non Hate): 0.6263736263736264
+     Accuracy: 0.6880733944954128
+
+The metrics for glowing-rocket-2 run are: description
+glowing-rocket-2
+     Precision: 0.8064516129032258
+     Precision for (Non Hate): 0.7021276595744681
+     Recall: 0.78125
+     Recall for (Non Hate): 0.7333333333333333
+     F1 score: 0.7936507936507936
+     F1 score for (Non Hate): 0.7173913043478262
+     Accuracy: 0.7614678899082569
+
+The metrics for prosperous-noodles-3 run are: description key phrases
+prosperous-noodles-3
+     Precision: 0.813953488372093
+     Precision for (Non Hate): 0.7415730337078652
+     Recall: 0.8203125
+     Recall for (Non Hate): 0.7333333333333333
+     F1 score: 0.8171206225680933
+     F1 score for (Non Hate): 0.7374301675977653
+     Accuracy: 0.7844036697247706
+
+The metrics for lucky-rabbit-8 run are: transcript
+lucky-rabbit-8
+     Precision: 0.7641509433962265
+     Precision for (Non Hate): 0.5803571428571429
+     Recall: 0.6328125
+     Recall for (Non Hate): 0.7222222222222222
+     F1 score: 0.6923076923076924
+     F1 score for (Non Hate): 0.6435643564356436
+     Accuracy: 0.6697247706422018
+
+The metrics for chromatic-monkey-4 run are: transcript key phrases
+chromatic-monkey-4
+     Precision: 0.643312101910828
+     Precision for (Non Hate): 0.5573770491803278
+     Recall: 0.7890625
+     Recall for (Non Hate): 0.37777777777777777
+     F1 score: 0.7087719298245613
+     F1 score for (Non Hate): 0.4503311258278146
+     Accuracy: 0.6192660550458715
+
+The metrics for red-festival-6 run are: Other Comment
+red-festival-6
+     Precision: 0.8888888888888888
+     Precision for (Non Hate): 0.7090909090909091
+     Recall: 0.75
+     Recall for (Non Hate): 0.8666666666666667
+     F1 score: 0.8135593220338982
+     F1 score for (Non Hate): 0.7800000000000001
+     Accuracy: 0.7981651376146789
+
+The metrics for twinkling-ox-7 run are: Title + Description Key Phrases
+twinkling-ox-7
+     Precision: 0.8125
+     Precision for (Non Hate): 0.6509433962264151
+     Recall: 0.7109375
+     Recall for (Non Hate): 0.7666666666666667
+     F1 score: 0.7583333333333333
+     F1 score for (Non Hate): 0.7040816326530612
+     Accuracy: 0.7339449541284404
+
+The metrics for vivid-paper-11 run are: Description + Transcript Key Phrases
+vivid-paper-11
+     Precision: 0.7938931297709924
+     Precision for (Non Hate): 0.7241379310344828
+     Recall: 0.8125
+     Recall for (Non Hate): 0.7
+     F1 score: 0.8030888030888031
+     F1 score for (Non Hate): 0.711864406779661
+     Accuracy: 0.7660550458715596
+
+The metrics for floating-snake-10 run are: Title + Description + Transcript Key Phrases
+floating-snake-10
+     Precision: 0.9117647058823529
+     Precision for (Non Hate): 0.6982758620689655
+     Recall: 0.7265625
+     Recall for (Non Hate): 0.9
+     F1 score: 0.8086956521739131
+     F1 score for (Non Hate): 0.7864077669902912
+     Accuracy: 0.7981651376146789
+
+The metrics for auspicious-peony-9 run are: All Key Phrases
+auspicious-peony-9
+     Precision: 0.8272727272727273
+     Precision for (Non Hate): 0.6574074074074074
+     Recall: 0.7109375
+     Recall for (Non Hate): 0.7888888888888889
+     F1 score: 0.7647058823529412
+     F1 score for (Non Hate): 0.7171717171717172
+     Accuracy: 0.7431192660550459
+
+The metrics for radiant-envelope-13 run are: Description + Transcript + other comments Key Phrases 
+radiant-envelope-13
+     Precision: 0.8125
+     Precision for (Non Hate): 0.7333333333333333
+     Recall: 0.8125
+     Recall for (Non Hate): 0.7333333333333333
+     F1 score: 0.8125
+     F1 score for (Non Hate): 0.7333333333333333
+     Accuracy: 0.7798165137614679
+
+The metrics for vivid-rocket-14 run are: Longformer-base Title + Description + Transcript Key Phrases
+vivid-rocket-14
+     Precision: 0.7720588235294118
+     Precision for (Non Hate): 0.7195121951219512
+     Recall: 0.8203125
+     Recall for (Non Hate): 0.6555555555555556
+     F1 score: 0.7954545454545454
+     F1 score for (Non Hate): 0.6860465116279069
+     Accuracy: 0.7522935779816514
+
+The metrics for golden-peony-16 run are: Longformer-base All Key extract
+golden-peony-16
+     Precision: 0.8057553956834532
+     Precision for (Non Hate): 0.7974683544303798
+     Recall: 0.875
+     Recall for (Non Hate): 0.7
+     F1 score: 0.8389513108614233
+     F1 score for (Non Hate): 0.7455621301775147
+     Accuracy: 0.8027522935779816
+
+The metrics for resplendent-bao-15 run are: Longformer-large Title + Description + Transcript Key Phrases
+resplendent-bao-15
+     Precision: 0.859504132231405
+     Precision for (Non Hate): 0.7525773195876289
+     Recall: 0.8125
+     Recall for (Non Hate): 0.8111111111111111
+     F1 score: 0.8353413654618473
+     F1 score for (Non Hate): 0.7807486631016044
+     Accuracy: 0.8119266055045872
+
+The metrics for legendary-fuse-12 run are: Longformer-large All Key Phrases
+legendary-fuse-12
+     Precision: 0.8269230769230769
+     Precision for (Non Hate): 0.631578947368421
+     Recall: 0.671875
+     Recall for (Non Hate): 0.8
+     F1 score: 0.7413793103448276
+     F1 score for (Non Hate): 0.7058823529411765
+     Accuracy: 0.7247706422018348

@@ -1,0 +1,20 @@
+
+The metrics for absurd-bush-78 run are: comment
+
+The metrics for cosmic-snowball-82 run are: transcript
+
+The metrics for dark-fire-84 run are: title description key word extract
+
+The metrics for dauntless-star-80 run are: title
+
+The metrics for floral-shadow-88 run are: title description transcript key word extract
+
+The metrics for laced-fire-79 run are: description
+
+The metrics for prime-star-89 run are: title description transcript other comments
+
+The metrics for ruby-feather-83 run are: description word extract
+
+The metrics for upbeat-cherry-81 run are: transcript word extract
+
+The metrics for woven-haze-90 run are: other comment

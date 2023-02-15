@@ -2,7 +2,7 @@ import json
 
 import pandas as pd
 
-from bitchute import get_bitchute_data
+from download_data.bitchute import get_bitchute_data
 from youtube import get_youtube_data
 from tqdm import tqdm
 from datetime import datetime
