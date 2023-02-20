@@ -127,7 +127,7 @@ class HateSpeechData(data.Dataset):
                     break
 
             frame_data = torch.cat(frame_data) # Number of frames, channels, image width, image height
-            frame_data = frame_data.movedim(frame_data, 1, 0) # channels, Number of frames, image width, image height
+            frame_data = torch.movedim(frame_data, 1, 0) # channels, Number of frames, image width, image height
             
         if self.args.multilabel:
             target = np.zeros(5, dtype=float)
