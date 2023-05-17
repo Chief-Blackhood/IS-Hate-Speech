@@ -15,6 +15,7 @@ import ast
 
 from dataloader import HateSpeechData
 from model import LFEmbeddingModule, VisionModule, CommentModel
+from loss import MultiTaskLoss
 
 def get_params():
     parser = argparse.ArgumentParser()
@@ -46,7 +47,7 @@ def get_params():
     parser.add_argument("--other_comments_token_count", default=300, type=int, help="number of token to consider of transcript")
     parser.add_argument("--add_video", default=False, type=ast.literal_eval, help="add video as context")
     parser.add_argument("--video_path", default='data/videos/', type=str, help='directory which contains videos')
-    parser.add_argument("--multilabel", default=False, type=ast.literal_eval, help="Flag for multilabel classificaiton")
+    parser.add_argument("--multitask", default=True, type=ast.literal_eval, help="Flag for multitask classificaiton")
     parser.add_argument("--remove_none", default=False, type=ast.literal_eval, help="Flag for removing Non-Hate in multilabel classification")
     
     return parser.parse_args()
@@ -99,12 +100,12 @@ def save_checkpoint(state, args, name, filename='checkpoint.pth.tar', is_best=Fa
         # shutil.copyfile(filename, best_filename)
 
 def collate_fn(batch):
-    comments, titles, descriptions, transcriptions, other_comments, frames, labels = zip(*batch)
+    comments, titles, descriptions, transcriptions, other_comments, frames, label_binary, label_multilabel = zip(*batch)
 
     max_frames = max([image.size(1) for image in frames])
     frames = torch.tensor(np.array([F.pad(image, [0, 0, 0, 0, 0, max_frames - image.size(1)]).numpy() for image in frames]))
     labels = torch.tensor(labels).reshape(-1, 1)
-    return [comments, titles, descriptions, transcriptions, other_comments, frames, labels]
+    return [comments, titles, descriptions, transcriptions, other_comments, frames, label_binary, label_multilabel]
 
 
 def get_data_loaders(args, phase):
@@ -113,17 +114,19 @@ def get_data_loaders(args, phase):
     dataloader = DataLoader(data, collate_fn=collate_fn, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers)
     return dataloader
 
-def train_one_epoch(train_loader, epoch, phase, device, criterion, optimizer, lf_model, vision_model, comment_model, args):
+def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, lf_model, vision_model, comment_model, multitaskloss_instance, args):
     
     lf_model.lf_model.train()
     vision_model.model.eval()
     comment_model.train()
+    multitaskloss_instance.train()
 
     
     losses = AverageMeter()
     acces = AverageMeter()
-    for itr, (comment, title, description, transcription, other_comments, frames, label) in enumerate(train_loader):
-        label = label.to(device)
+    for itr, (comment, title, description, transcription, other_comments, frames, label_binary, label_multilabel) in enumerate(train_loader):
+        label_binary = label_binary.to(device)
+        label_multilabel = label_multilabel.to(device)
 
         vis_emb = None
         if args.add_video:
@@ -131,44 +134,38 @@ def train_one_epoch(train_loader, epoch, phase, device, criterion, optimizer, lf
         
         output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vis_emb)
 
-        loss = criterion(output, label)        
+        loss_multilabel = criterions[0](output[0], label_multilabel)        
+        loss_binary = criterions[1](output[1], label_binary)      
+
+        losses = torch.stack(loss_multilabel, loss_binary)
+        multitaskloss = multitaskloss_instance(losses)
         
         optimizer.zero_grad()
-        loss.backward()
+        multitaskloss.backward()
         optimizer.step()
 
-        if args.multilabel:
-            pass
-        else:
-            output = np.round(output.detach().cpu().numpy())
-            label = np.round(label.detach().cpu().numpy())
+        output_binary = np.round(output[1].detach().cpu().numpy())
+        label_binary = np.round(label_binary.detach().cpu().numpy())
+    
+        acc = accuracy(output_binary, label_binary)
+        acces.update(acc, args.batch_size)
         
-            acc = accuracy(output, label)
-            acces.update(acc, args.batch_size)
-        
-        losses.update(loss.data.item(), args.batch_size)
+        losses.update(multitaskloss.data.item(), args.batch_size)
 
-        if args.multilabel:
-            if itr % 25 == 0:
-                print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d}\t'
-                    'loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                    .format(
-                    epoch, itr, len(train_loader), loss=losses))   
-        else:
-            if itr % 25 == 0:
-                print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d}\t'
-                    'loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                    'accu {acc.val:.3f} ({acc.avg:.3f})\t'.format(
-                    epoch, itr, len(train_loader), loss=losses, acc=acces))        
-    if args.multilabel:
-        return losses.avg, None   
+        if itr % 25 == 0:
+            print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d}\t'
+                'loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                'accu {acc.val:.3f} ({acc.avg:.3f})\t'.format(
+                epoch, itr, len(train_loader), loss=losses, acc=acces))
+
     return losses.avg, acces.avg
         
-def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, vision_model, comment_model, args):
+def eval_one_epoch(test_loader, epoch, phase, device, criterions, lf_model, vision_model, comment_model, multitaskloss_instance, args):
 
     lf_model.lf_model.eval()
     vision_model.model.eval()
     comment_model.eval()
+    multitaskloss_instance.eval()
 
     losses = AverageMeter()
     acces = AverageMeter()
@@ -176,8 +173,9 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, visio
     preds = []
     labels = []
     with torch.no_grad():
-        for itr, (comment, title, description, transcription, other_comments, frames, label) in enumerate(test_loader):
-            label = label.to(device)
+        for itr, (comment, title, description, transcription, other_comments, frames, label_binary, label_multilabel) in enumerate(test_loader):
+            label_binary = label_binary.to(device)
+            label_multilabel = label_multilabel.to(device)
 
             vis_emb = None
             if args.add_video:
@@ -185,38 +183,33 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterion, lf_model, visio
 
             output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vis_emb)
 
-            loss = criterion(output, label)
+            loss_multilabel = criterions[0](output[0], label_multilabel)        
+            loss_binary = criterions[1](output[1], label_binary)      
 
-            label = np.round(label.detach().cpu().numpy())
+            losses = torch.stack(loss_multilabel, loss_binary)
+            multitaskloss = multitaskloss_instance(losses)
 
-            if args.multilabel:
-                output = output.detach().cpu().numpy()
-            else:
-                output = np.round(output.detach().cpu().numpy())
+            output_binary = output[1].detach().cpu().numpy()
+            output_multilabel = output[0].detach().cpu().numpy()
+
+            label_binary = np.round(label_binary.detach().cpu().numpy())
+            label_multilabel = np.round(label_multilabel.detach().cpu().numpy())
         
-                acc = accuracy(output, label)
-                acces.update(acc, args.batch_size)
+            acc = accuracy(np.round(output_binary), label_binary)
+            acces.update(acc, args.batch_size)
 
-            
-            losses.update(loss.data.item(), args.batch_size)
+            losses.update(multitaskloss.data.item(), args.batch_size)
 
-            preds.extend(list(output))
-            labels.extend(list(label))
+            preds.append(list([output_binary.tolist(), output_multilabel.tolist()]))
+            labels.append(list([label_binary.tolist(), label_multilabel.tolist()]))
         
-            if args.multilabel:
-                if itr % 25 == 0:
-                    print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d}\t'
-                        'loss {loss.val:.4f} ({loss.avg:.4f})'
-                        .format(
-                        epoch, itr, len(test_loader), loss=losses))   
-            else:
-                if itr % 25 == 0:
-                    print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d}\t'
-                        'loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                        'accu {acc.val:.3f} ({acc.avg:.3f})\t'.format(
-                        epoch, itr, len(test_loader), loss=losses, acc=acces))     
-    if args.multilabel:
-        return losses.avg, None, preds, labels
+
+            if itr % 25 == 0:
+                print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d}\t'
+                    'loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                    'accu {acc.val:.3f} ({acc.avg:.3f})\t'.format(
+                    epoch, itr, len(test_loader), loss=losses, acc=acces))     
+
     return losses.avg, acces.avg, preds, labels
 
 
@@ -243,11 +236,9 @@ def main():
     lf_model = LFEmbeddingModule(args, device)
     vision_model = VisionModule(args, device)
     comment_model = CommentModel(args).to(device)
-    if args.multilabel:
-        # weights = torch.Tensor([6485/244, 6485/281, 6485/1756, 6485/1452, 6485/2927]).float()
-        criterion = nn.BCEWithLogitsLoss().to(device)
-    else:
-        criterion = nn.BCELoss().to(device)
+    multitaskloss_instance = MultiTaskLoss(n_tasks=2, reduction="sum")
+
+    criterions = [nn.BCEWithLogitsLoss().to(device), nn.BCELoss().to(device)]
 
     config = wandb.config
     config.lr = args.lr
@@ -255,7 +246,7 @@ def main():
     wandb.watch(comment_model)
 
     params = []
-    for model in [lf_model.lf_model, comment_model]:
+    for model in [lf_model.lf_model, comment_model, multitaskloss_instance]:
         params += list(model.parameters())
 
     optimizer = optim.Adam(params, lr = args.lr)
@@ -265,70 +256,41 @@ def main():
     if not os.path.exists(args.work_dir):
         os.mkdir(args.work_dir)
     
-    best_eval_acc = 0
     best_eval_loss = np.inf
     train_acc = 0
     eval_acc = 0
     train_loss = 0
     eval_loss = 0
     for epoch in range(args.max_epochs):
-        train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterion, optimizer, lf_model, vision_model, comment_model, args)
-        eval_loss, eval_acc, _, _ = eval_one_epoch(validation_loader, epoch, 'Eval', device, criterion, lf_model, vision_model, comment_model, args)
-        if args.multilabel:
-            print('Epoch-{:<3d} Train: loss {:.4f}\tEval: loss {:.4f}'
-                    .format(epoch, train_loss, eval_loss))
-            wandb.log({'Train Loss': train_loss, 'Eval Loss': eval_loss})
-        else:
-            print('Epoch-{:<3d} Train: loss {:.4f}\taccu {:.4f}\tEval: loss {:.4f}\taccu {:.4f}'
-                    .format(epoch, train_loss, train_acc, eval_loss, eval_acc))
-            wandb.log({'Train Loss': train_loss, 'Train Acc': train_acc, 'Eval Loss': eval_loss, 'Eval Acc': eval_acc})
+        train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterions, optimizer, lf_model, vision_model, comment_model, multitaskloss_instance, args)
+        eval_loss, eval_acc, _, _ = eval_one_epoch(validation_loader, epoch, 'Eval', device, criterions, lf_model, vision_model, comment_model, multitaskloss_instance, args)
+        print('Epoch-{:<3d} Train: loss {:.4f}\taccu {:.4f}\tEval: loss {:.4f}\taccu {:.4f}'
+                .format(epoch, train_loss, train_acc, eval_loss, eval_acc))
+        wandb.log({'Train Loss': train_loss, 'Train Acc': train_acc, 'Eval Loss': eval_loss, 'Eval Acc': eval_acc})
         scheduler.step(eval_loss)
         is_better = False
-        if args.multilabel:
-            if eval_loss <= best_eval_loss:
-                best_eval_loss = eval_loss
-                is_better = True
-        else:
-            if eval_acc >= best_eval_acc:
-                best_eval_acc = eval_acc
-                is_better = True
+        if eval_loss <= best_eval_loss:
+            best_eval_loss = eval_loss
+            is_better = True
         
-        if args.multilabel:
-            save_checkpoint({ 'epoch': epoch,
-                'state_dict': lf_model.lf_model.state_dict(),
-                'best_loss': eval_loss,
-                'monitor': 'eval_loss',
-                'optimizer': optimizer.state_dict()
-            }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
-            save_checkpoint({ 'epoch': epoch ,
-                'state_dict': comment_model.state_dict(),
-                'best_loss': eval_loss,
-                'monitor': 'eval_loss',
-                'vpm_optimizer': optimizer.state_dict()
-            }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
-
-        else:
-            save_checkpoint({ 'epoch': epoch,
-                'state_dict': lf_model.lf_model.state_dict(),
-                'best_loss': eval_loss,
-                'best_acc' : eval_acc,
-                'monitor': 'eval_acc',
-                'optimizer': optimizer.state_dict()
-            }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
-            save_checkpoint({ 'epoch': epoch ,
-                'state_dict': comment_model.state_dict(),
-                'best_loss': eval_loss,
-                'best_acc' : eval_acc,
-                'monitor': 'eval_acc',
-                'vpm_optimizer': optimizer.state_dict()
-            }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
+        save_checkpoint({ 'epoch': epoch,
+            'state_dict': lf_model.lf_model.state_dict(),
+            'best_loss': eval_loss,
+            'best_acc' : eval_acc,
+            'monitor': 'eval_acc',
+            'optimizer': optimizer.state_dict()
+        }, args, run.name, os.path.join(args.work_dir, 'lf_model_' + '.pth.tar'), is_better)
+        save_checkpoint({ 'epoch': epoch ,
+            'state_dict': comment_model.state_dict(),
+            'best_loss': eval_loss,
+            'best_acc' : eval_acc,
+            'monitor': 'eval_acc',
+            'vpm_optimizer': optimizer.state_dict()
+        }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
         
     #load_weights('best')
-    test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterion, lf_model, vision_model, comment_model, args)
-    if args.multilabel:
-        print('Test: loss {:.4f}'.format(test_loss))
-    else:
-        print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
+    test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterions, lf_model, vision_model, comment_model, multitaskloss_instance, args)
+    print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
     np.save(f'{args.work_dir}/test_preds_{run.name}.npy', np.array(test_pred))
     np.save(f'{args.work_dir}/test_labels_{run.name}.npy', np.array(test_label))
 

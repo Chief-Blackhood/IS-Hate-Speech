@@ -129,16 +129,14 @@ class HateSpeechData(data.Dataset):
             frame_data = torch.cat(frame_data) # Number of frames, channels, image width, image height
             frame_data = torch.movedim(frame_data, 1, 0) # channels, Number of frames, image width, image height
             
-        if self.args.multilabel:
-            target = np.zeros(5, dtype=float)
-            if self.args.remove_none:
-               target = np.zeros(4, dtype=float) 
-            labels = self.comments['target'][index].split(',')
-            for label in labels:
-                label = label.strip()
-                target[self.mapping[label]] = 1
-            target = torch.FloatTensor(target)
-        else:
-            label = self.comments['label'][index]
-            target = torch.FloatTensor([label]) 
-        return comment, title, desc, transcript, other_comment, frame_data, target
+        target_multilabel = np.zeros(5, dtype=float)
+        if self.args.remove_none:
+            target_multilabel = np.zeros(4, dtype=float) 
+        labels = self.comments['target'][index].split(',')
+        for label in labels:
+            label = label.strip()
+            target_multilabel[self.mapping[label]] = 1
+        target_multilabel = torch.FloatTensor(target_multilabel)
+        target_binary = torch.FloatTensor([self.comments['label'][index]])
+        
+        return comment, title, desc, transcript, other_comment, frame_data, target_binary, target_multilabel

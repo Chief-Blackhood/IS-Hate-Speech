@@ -100,23 +100,21 @@ class CommentModel(nn.Module):
             self.fc_size = 1024
         if self.args.add_video:
             self.fc_size += 512
-        if self.args.multilabel:
-            output_size = 5
-            if self.args.remove_none:
-                output_size = 4
-            self.fc = nn.Sequential(
-                nn.Linear(self.fc_size, output_size),
-            )
-        else:    
-            self.fc = nn.Sequential(
-                nn.Linear(self.fc_size, 1),
-                nn.Sigmoid()
-            )
+        output_size = 5
+        if self.args.remove_none:
+            output_size = 4
+        self.fc_multilabel = nn.Sequential(
+            nn.Linear(self.fc_size, output_size),
+        )
+        self.fc_binary = nn.Sequential(
+            nn.Linear(self.fc_size, 1),
+            nn.Sigmoid()
+        )
 
     def forward(self, text_emb, vision_emb):
+        inp_emb = text_emb
         if self.args.add_video:
-            fin_emb = torch.cat([text_emb, vision_emb], dim = 1)
-            out = self.fc(fin_emb)
-        else:
-            out = self.fc(text_emb)
+            inp_emb = torch.cat([inp_emb, vision_emb], dim = 1)
+        
+        out = [self.fc_multilabel(inp_emb), self.fc_binary(inp_emb)]
         return out
