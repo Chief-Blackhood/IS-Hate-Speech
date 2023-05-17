@@ -16,8 +16,7 @@ from config import *
 class HateSpeechData(data.Dataset):
 
     def __init__(self, args, phase):
-        if args.multilabel:
-            self.mapping = {"Organisation": 0, "Location": 1, "Individual": 2, "Community": 3, "None": 4}
+        self.mapping = {"Organisation": 0, "Location": 1, "Individual": 2, "Community": 3, "None": 4}
         self.args = args
         if phase == 'train':
             self.comments = self.load_comments(self.args.train_question_file)
