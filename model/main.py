@@ -137,8 +137,8 @@ def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, l
         loss_multilabel = criterions[0](output[0], label_multilabel)        
         loss_binary = criterions[1](output[1], label_binary)      
 
-        losses = torch.stack(loss_multilabel, loss_binary)
-        multitaskloss = multitaskloss_instance(losses)
+        losses_stack = torch.stack([loss_multilabel, loss_binary])
+        multitaskloss = multitaskloss_instance(losses_stack)
         
         optimizer.zero_grad()
         multitaskloss.backward()
@@ -186,8 +186,8 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterions, lf_model, visi
             loss_multilabel = criterions[0](output[0], label_multilabel)        
             loss_binary = criterions[1](output[1], label_binary)      
 
-            losses = torch.stack(loss_multilabel, loss_binary)
-            multitaskloss = multitaskloss_instance(losses)
+            losses_stack = torch.stack([loss_multilabel, loss_binary])
+            multitaskloss = multitaskloss_instance(losses_stack)
 
             output_binary = output[1].detach().cpu().numpy()
             output_multilabel = output[0].detach().cpu().numpy()
