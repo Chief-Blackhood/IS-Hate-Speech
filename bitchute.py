@@ -1,12 +1,36 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import re
 
 def get_bitchute_data(URL):
     time.sleep(0.01)
     r = requests.get(URL)
     soup = BeautifulSoup(r.content, "html.parser")
     video_data = {"url": URL}
+    scripts = soup.findAll('script')
+    regex_match = None
+    for script in scripts:
+        script_tag_contents = script.string
+        if script_tag_contents is not None:
+            ans = re.search(r"data: {cf_auth: '[^']*", script_tag_contents)
+            if ans:
+                regex_match = ans.group(0)
+    print(URL)
+    if regex_match is None:
+        print('regex_match is none')
+        video_data["comments"] = False
+        return video_data
+    print(regex_match)
+    regex_match = regex_match.split("data: {cf_auth: '")[1]
+    try:
+        cf_init, cf_extra = regex_match.split('== ')
+        cf_d, cf_plus = cf_extra.split(' ')
+        cf_auth = cf_init + "%3D%3D+" + cf_d + "+" + cf_plus
+    except:
+        cf_init, cf_d, cf_plus = regex_match.split(' ')
+        cf_auth = cf_init + "%3D%3D+" + cf_d + "+" + cf_plus
+    print('cf_auth: '+cf_auth)
 
     # Title
     video_data["title"] = soup.find("h1", attrs={"class": "page-title"}).text
@@ -55,7 +79,8 @@ def get_bitchute_data(URL):
         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
         "origin": "https://www.bitchute.com",
     }
-    data = "cf_auth=eyJwcm9maWxlX2lkIjogImFub255bW91cyIsICJvd25lcl9pZCI6ICJmQjRBQWYxZnJoc00iLCAiZGlzcGxheV9uYW1lIjogImFub255bW91cyIsICJ0aHJlYWRfaWQiOiAiYmNfSWVoQTliTTNBUWwxIiwgImljb25fdXJsIjogIi9zdGF0aWMvdjEzNS9pbWFnZXMvYmxhbmstcHJvZmlsZS5wbmciLCAiY2ZfaXNfYWRtaW4iOiAiZmFsc2UifQ%3D%3D+8610c55261a3e3454e5cd41528c55e2e1a55f150761e6753a90b1ff4830366db+1641106687&commentCount=0&isNameValuesArrays=true"
+    
+    data = f"cf_auth={cf_auth}&commentCount=0&isNameValuesArrays=true"
 
     time.sleep(0.01)
     comments = requests.post(
@@ -66,3 +91,5 @@ def get_bitchute_data(URL):
 
     video_data["comments"] = comments
     return video_data
+
+# print(get_bitchute_data('https://www.bitchute.com/video/Bb7rY7Id73Dd/'))
