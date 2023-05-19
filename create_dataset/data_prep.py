@@ -1,6 +1,7 @@
 from operator import index
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GroupShuffleSplit
+from tqdm import tqdm
 
 
 def load_sheet(url):
@@ -61,16 +62,50 @@ non_hate_df["category"] = non_hate_df["category"].str.lower()
 non_hate_df["label"] = "no"
 
 df = pd.concat([hate_df, non_hate_df])
-df["strat"] = df["category"] + " " + df["label"]
-y = df["label"]
-X = df.drop(columns=["label"])
+df.drop(columns=['Unnamed: 11'], inplace=True)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.1, shuffle=True, stratify=X["strat"]
-)
-X_train.drop(columns=["strat"], inplace=True)
-X_test.drop(columns=["strat"], inplace=True)
-df_train = pd.concat([X_train, y_train], axis=1)
-df_test = pd.concat([X_test, y_test], axis=1)
+# df["strat"] = df["category"] + " " + df["label"]
+# y = df["label"]
+# X = df.drop(columns=["label"])
+
+
+groups = df['url']
+
+best_state = 0
+min_diff = 1000000
+for random_state in tqdm(range(0, 1000)):
+    gss = GroupShuffleSplit(n_splits=1, test_size=0.1, random_state=random_state)
+
+    for train_index, test_index in gss.split(df, groups=groups):
+        df_train = df.iloc[train_index]
+        df_test = df.iloc[test_index]
+
+    try:
+        count_train = df_train['category'].value_counts().to_dict()
+        count_test = df_test['category'].value_counts().to_dict()
+        diff = {k : count_train[k] - count_test[k] * 9 for k in count_train}
+        value_sum = sum(map(abs, diff.values()))
+        if value_sum < min_diff:
+            best_state = random_state
+            min_diff = value_sum
+    except:
+        continue
+
+print(best_state, min_diff)
+gss = GroupShuffleSplit(n_splits=1, test_size=0.1, random_state=best_state)
+
+for train_index, test_index in gss.split(df, groups=groups):
+    df_train = df.iloc[train_index]
+    df_test = df.iloc[test_index]
+
+
+# X_train, X_test, y_train, y_test = train_test_split(
+#     X, y, test_size=0.1, shuffle=True, stratify=X["strat"]
+# )
+
+# X_train.drop(columns=["strat"], inplace=True)
+# X_test.drop(columns=["strat"], inplace=True)
+# df_train = pd.concat([X_train, y_train], axis=1)
+# df_test = pd.concat([X_test, y_test], axis=1)
 df_train.to_csv("data/without_aug/train.csv", index=False)
 df_test.to_csv("data/without_aug/test.csv", index=False)
