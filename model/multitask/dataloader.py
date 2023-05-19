@@ -82,7 +82,7 @@ class HateSpeechData(data.Dataset):
 
     def load_comments(self, filename):
         df = pd.read_csv(filename)
-        df['label'] = df['label'].apply(lambda x: x == 'yes')
+        df['label'] = df['label'].apply(lambda x: int(x == 'yes'))
         return df
 
     def __len__(self):
@@ -131,7 +131,7 @@ class HateSpeechData(data.Dataset):
         target_multilabel = np.zeros(5, dtype=float)
         if self.args.remove_none:
             target_multilabel = np.zeros(4, dtype=float) 
-        labels = self.comments['target'][index].split(',')
+        labels = self.comments['hate_towards_whom'][index].split(',')
         for label in labels:
             label = label.strip()
             target_multilabel[self.mapping[label]] = 1

@@ -21,7 +21,7 @@ def get_params():
     parser = argparse.ArgumentParser()
     parser.add_argument("--work_dir", default = 'model_comment/', type = str, help='location of all the train and model files located')
     parser.add_argument("--train_question_file", default='data/with_aug_ttv/train.csv', type=str, help='train data')
-    parser.add_argument("--validation_question_file", default='data/with_aug_ttv/validation.csv', type=str, help='validation data')
+    parser.add_argument("--validation_question_file", default='data/with_aug_ttv/eval.csv', type=str, help='validation data')
     parser.add_argument("--test_question_file", default='data/with_aug_ttv/test.csv', type=str, help='test data')
     parser.add_argument("--batch_size", default=8, type=int, help='batch size')
     parser.add_argument("--model", default='bert-large-cased', choices=['bert-large-cased', 'bert-base-cased', 'allenai/longformer-base-4096', 'allenai/longformer-large-4096'], type=str, help='which model to try from bert-large, bert-base and longformer')
@@ -104,7 +104,8 @@ def collate_fn(batch):
 
     max_frames = max([image.size(1) for image in frames])
     frames = torch.tensor(np.array([F.pad(image, [0, 0, 0, 0, 0, max_frames - image.size(1)]).numpy() for image in frames]))
-    labels = torch.tensor(labels).reshape(-1, 1)
+    label_binary = torch.tensor(label_binary).reshape(-1, 1)
+    label_multilabel = torch.stack(list(label_multilabel), dim=0)
     return [comments, titles, descriptions, transcriptions, other_comments, frames, label_binary, label_multilabel]
 
 
