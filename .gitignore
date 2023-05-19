@@ -3,6 +3,7 @@
 .DS_Store
 youtube_data.json
 bitchute_data.json
+non_hate_youtube_data.json
 collect_data.*
 bitchute_videos/
 youtube_videos/
@@ -12,3 +13,10 @@ wandb/
 wandb_key
 *.zip
 cardiffnlp
+transcripts
+LAL-Parser
+models
+npy_files/
+test.ipynb
+keyphrases_other_comments.json
+run_commands_manish_sir.txt

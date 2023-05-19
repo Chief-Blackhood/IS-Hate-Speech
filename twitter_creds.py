@@ -1,2 +1,0 @@
-consumer_key="PI0emIQ7EdInH6Vlf80S2aeTC"
-consumer_key_secret="V7b0jHQeCJdcqpLH91tojHLhh35tk3bP75hUO9pWYTWN8GBIEl"

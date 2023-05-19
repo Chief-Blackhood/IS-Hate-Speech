@@ -1,0 +1,39 @@
+The metrics for brisk-pine-60 run are: Longformer large, Title, description, transcript, video key extract
+brisk-pine-60
+     Precision: 0.7844827586206896
+     Precision for (Non Hate): 0.6372549019607843
+     Recall: 0.7109375
+     Recall for (Non Hate): 0.7222222222222222
+     F1 score: 0.7459016393442625
+     F1 score for (Non Hate): 0.6770833333333333
+     Accuracy: 0.7155963302752294
+
+The metrics for chocolate-music-61 run are: bert large, t, d, trans, video
+chocolate-music-61
+     Precision: 0.84375
+     Precision for (Non Hate): 0.7888888888888889
+     Recall: 0.8503937007874016
+     Recall for (Non Hate): 0.7802197802197802
+     F1 score: 0.8470588235294119
+     F1 score for (Non Hate): 0.7845303867403316
+     Accuracy: 0.8211009174311926
+
+The metrics for gallant-eon-46 run are: comment + video
+gallant-eon-46
+     Precision: 0.8545454545454545
+     Precision for (Non Hate): 0.6851851851851852
+     Recall: 0.734375
+     Recall for (Non Hate): 0.8222222222222222
+     F1 score: 0.7899159663865547
+     F1 score for (Non Hate): 0.7474747474747475
+     Accuracy: 0.7706422018348624
+
+The metrics for robust-breeze-59 run are: Longformer base, t, d, trans, c, v
+robust-breeze-59
+     Precision: 0.8984375
+     Precision for (Non Hate): 0.7
+     Recall: 0.8098591549295775
+     Recall for (Non Hate): 0.8289473684210527
+     F1 score: 0.8518518518518519
+     F1 score for (Non Hate): 0.7590361445783133
+     Accuracy: 0.8165137614678899

@@ -1,0 +1,50 @@
+
+The metrics for brisk-sea-62 run are: bert large comment + video
+brisk-sea-62
+     Precision: 0.75
+     Precision for (Non Hate): 0.7777777777777778
+     Recall: 0.8275862068965517
+     Recall for (Non Hate): 0.6862745098039216
+     F1 score: 0.7868852459016394
+     F1 score for (Non Hate): 0.7291666666666667
+     Accuracy: 0.7614678899082569
+
+The metrics for comic-star-62 run are: bert large desc + trans + other comment + video
+comic-star-62
+     Precision: 0.796875
+     Precision for (Non Hate): 0.8777777777777778
+     Recall: 0.9026548672566371
+     Recall for (Non Hate): 0.7523809523809524
+     F1 score: 0.8464730290456431
+     F1 score for (Non Hate): 0.8102564102564102
+     Accuracy: 0.8302752293577982
+
+The metrics for denim-smoke-62 run are: longformer base + title + trans + desc + other comment + video
+denim-smoke-62
+     Precision: 0.8174603174603174
+     Precision for (Non Hate): 0.7282608695652174
+     Recall: 0.8046875
+     Recall for (Non Hate): 0.7444444444444445
+     F1 score: 0.8110236220472441
+     F1 score for (Non Hate): 0.7362637362637363
+     Accuracy: 0.7798165137614679
+
+The metrics for fresh-grass-66 run are: longformer large + title + desc + trans
+fresh-grass-66
+     Precision: 0.7711864406779662
+     Precision for (Non Hate): 0.63
+     Recall: 0.7109375
+     Recall for (Non Hate): 0.7
+     F1 score: 0.7398373983739838
+     F1 score for (Non Hate): 0.663157894736842
+     Accuracy: 0.7064220183486238
+
+The metrics for restful-eon-65 run are: longformer large + title + desc + trans + video
+restful-eon-65
+     Precision: 0.6171875
+     Precision for (Non Hate): 0.9222222222222223
+     Recall: 0.9186046511627907
+     Recall for (Non Hate): 0.6287878787878788
+     F1 score: 0.7383177570093459
+     F1 score for (Non Hate): 0.7477477477477478
+     Accuracy: 0.7431192660550459
