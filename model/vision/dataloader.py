@@ -133,7 +133,7 @@ class HateSpeechData(data.Dataset):
             target = np.zeros(5, dtype=float)
             if self.args.remove_none:
                target = np.zeros(4, dtype=float) 
-            labels = self.comments['target'][index].split(',')
+            labels = self.comments['hate_towards_whom'][index].split(',')
             for label in labels:
                 label = label.strip()
                 target[self.mapping[label]] = 1
