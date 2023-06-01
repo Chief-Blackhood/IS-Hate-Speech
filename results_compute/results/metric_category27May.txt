@@ -1,0 +1,128 @@
+The metrics for deep-salad-75 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.2330508474576271 	Hamming Score: 0.48534604519774005
+Organisation Precision: 0.3333333333333333 Recall: 0.0625 F1 Score: 0.10526315789473684
+Location Precision: 1.0 Recall: 0.03125 F1 Score: 0.06060606060606061
+Individual Precision: 0.5376344086021505 Recall: 0.3333333333333333 F1 Score: 0.4115226337448559
+Community Precision: 0.3709677419354839 Recall: 0.23232323232323232 F1 Score: 0.2857142857142857
+None Precision: 0.6194690265486725 Recall: 0.7567567567567568 F1 Score: 0.6812652068126521
+
+The metrics for earthy-disco-76 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.21059322033898306 	Hamming Score: 0.49435028248587565
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Community Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+None Precision: 0.6651982378854625 Recall: 0.8162162162162162 F1 Score: 0.733009708737864
+
+The metrics for fallen-elevator-78 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.2033898305084746 	Hamming Score: 0.5063559322033898
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.5806451612903226 Recall: 0.12 F1 Score: 0.1988950276243094
+Community Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+None Precision: 0.6192468619246861 Recall: 0.8 F1 Score: 0.6981132075471699
+
+The metrics for fanciful-leaf-81 run are:
+Thresh: 0.4 	Hamming Loss: 0.18008474576271186 	Hamming Score: 0.5561440677966102
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.6404494382022472 Recall: 0.38 F1 Score: 0.4769874476987448
+Community Precision: 0.45098039215686275 Recall: 0.23232323232323232 F1 Score: 0.30666666666666664
+None Precision: 0.680672268907563 Recall: 0.8756756756756757 F1 Score: 0.7659574468085106
+
+The metrics for fiery-brook-86 run are:
+Thresh: 0.2 	Hamming Loss: 0.2656779661016949 	Hamming Score: 0.45886299435028244
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.05263157894736842 Recall: 0.03125 F1 Score: 0.0392156862745098
+Individual Precision: 0.5294117647058824 Recall: 0.18 F1 Score: 0.26865671641791045
+Community Precision: 0.3137254901960784 Recall: 0.16161616161616163 F1 Score: 0.21333333333333335
+None Precision: 0.5791505791505791 Recall: 0.8108108108108109 F1 Score: 0.6756756756756758
+
+The metrics for giddy-haze-78 run are:
+Thresh: 0.2 	Hamming Loss: 0.29745762711864404 	Hamming Score: 0.4189618644067797
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.5 Recall: 0.013333333333333334 F1 Score: 0.025974025974025976
+Community Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+None Precision: 0.6764705882352942 Recall: 0.4972972972972973 F1 Score: 0.5732087227414331
+
+The metrics for kind-sunset-85 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.2016949152542373 	Hamming Score: 0.5211864406779662
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.5510204081632653 Recall: 0.36 F1 Score: 0.4354838709677419
+Community Precision: 0.3709677419354839 Recall: 0.23232323232323232 F1 Score: 0.2857142857142857
+None Precision: 0.6053639846743295 Recall: 0.8540540540540541 F1 Score: 0.7085201793721975
+
+The metrics for kind-terrain-78 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.22330508474576272 	Hamming Score: 0.4632768361581921
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 1.0 Recall: 0.03125 F1 Score: 0.06060606060606061
+Individual Precision: 0.42696629213483145 Recall: 0.25333333333333335 F1 Score: 0.3179916317991632
+Community Precision: 0.27450980392156865 Recall: 0.1414141414141414 F1 Score: 0.18666666666666665
+None Precision: 0.6745562130177515 Recall: 0.6162162162162163 F1 Score: 0.6440677966101694
+
+The metrics for misty-cloud-86 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.22415254237288135 	Hamming Score: 0.4685734463276836
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Community Precision: 0.358974358974359 Recall: 0.1414141414141414 F1 Score: 0.2028985507246377
+None Precision: 0.5795918367346938 Recall: 0.7675675675675676 F1 Score: 0.6604651162790698
+
+The metrics for playful-yogurt-89 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.21059322033898306 	Hamming Score: 0.4650423728813559
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.5205479452054794 Recall: 0.25333333333333335 F1 Score: 0.3408071748878924
+Community Precision: 0.3939393939393939 Recall: 0.13131313131313133 F1 Score: 0.19696969696969696
+None Precision: 0.6511627906976745 Recall: 0.6054054054054054 F1 Score: 0.6274509803921569
+
+The metrics for revived-dream-83 run are:
+Thresh: 0.2 	Hamming Loss: 0.21652542372881356 	Hamming Score: 0.5169491525423728
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.6666666666666666 Recall: 0.24 F1 Score: 0.3529411764705882
+Community Precision: 0.375 Recall: 0.030303030303030304 F1 Score: 0.05607476635514019
+None Precision: 0.5589225589225589 Recall: 0.8972972972972973 F1 Score: 0.6887966804979254
+
+The metrics for ruby-night-77 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.2478813559322034 	Hamming Score: 0.4807556497175141
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.5555555555555556 Recall: 0.23333333333333334 F1 Score: 0.3286384976525822
+Community Precision: 0.25 Recall: 0.0707070707070707 F1 Score: 0.11023622047244094
+None Precision: 0.7307692307692307 Recall: 0.7189189189189189 F1 Score: 0.7247956403269755
+
+The metrics for sandy-plasma-84 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.19745762711864406 	Hamming Score: 0.5434322033898306
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.375 Recall: 0.09375 F1 Score: 0.15
+Individual Precision: 0.6274509803921569 Recall: 0.4266666666666667 F1 Score: 0.5079365079365079
+Community Precision: 0.32926829268292684 Recall: 0.2727272727272727 F1 Score: 0.29834254143646405
+None Precision: 0.6731707317073171 Recall: 0.745945945945946 F1 Score: 0.7076923076923077
+
+The metrics for splendid-plant-103 run are:
+Thresh: 0.4 	Hamming Loss: 0.2542372881355932 	Hamming Score: 0.3919491525423729
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Community Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+None Precision: 0.8 Recall: 0.021621621621621623 F1 Score: 0.042105263157894736
+
+The metrics for stilted-haze-91 run are:
+Thresh: 0.30000000000000004 	Hamming Loss: 0.275 	Hamming Score: 0.4258474576271186
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Community Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+None Precision: 0.5 Recall: 0.7567567567567568 F1 Score: 0.6021505376344086
+
+The metrics for wobbly-lion-83 run are:
+Thresh: 0.2 	Hamming Loss: 0.23601694915254237 	Hamming Score: 0.4777542372881356
+Organisation Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Location Precision: 0.0 Recall: 0.0 F1 Score: 0.0
+Individual Precision: 0.875 Recall: 0.09333333333333334 F1 Score: 0.1686746987951807
+Community Precision: 0.3442622950819672 Recall: 0.42424242424242425 F1 Score: 0.38009049773755654
+None Precision: 0.6106194690265486 Recall: 0.745945945945946 F1 Score: 0.6715328467153284
+
