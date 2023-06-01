@@ -20,3 +20,5 @@ npy_files/
 test.ipynb
 keyphrases_other_comments.json
 run_commands_manish_sir.txt
+data/videos
+data/CLIP_embeddings
