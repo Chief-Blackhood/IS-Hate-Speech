@@ -114,6 +114,7 @@ class CommentModel(nn.Module):
             )
 
     def forward(self, text_emb, vision_emb):
+        print(vision_emb.shape)
         if self.args.add_video:
             fin_emb = torch.cat([text_emb, vision_emb], dim = 1)
             out = self.fc(fin_emb)

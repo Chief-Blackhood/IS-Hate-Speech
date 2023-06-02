@@ -14,7 +14,7 @@ import wandb
 import ast
 
 from dataloader import HateSpeechData
-from model import LFEmbeddingModule, VisionModule, CommentModel
+from model import LFEmbeddingModule, CommentModel
 from loss import MultiTaskLoss
 
 def get_params():
@@ -23,10 +23,11 @@ def get_params():
     parser.add_argument("--train_question_file", default='data/with_aug_ttv/train.csv', type=str, help='train data')
     parser.add_argument("--validation_question_file", default='data/with_aug_ttv/eval.csv', type=str, help='validation data')
     parser.add_argument("--test_question_file", default='data/with_aug_ttv/test.csv', type=str, help='test data')
+    parser.add_argument("--clip_embeedings_path", default='data/CLIP_embeddings', type=str, help='clip embeddings data')
     parser.add_argument("--batch_size", default=8, type=int, help='batch size')
     parser.add_argument("--model", default='bert-large-cased', choices=['bert-large-cased', 'bert-base-cased', 'allenai/longformer-base-4096', 'allenai/longformer-large-4096'], type=str, help='which model to try from bert-large, bert-base and longformer')
     parser.add_argument("--lr", default=0.0003, type=float, help='learning rate')
-    parser.add_argument("--num_workers", default=4, type=int, help='number of workers')
+    parser.add_argument("--num_workers", default=0, type=int, help='number of workers')
     parser.add_argument("--max_epochs", default=1, type=int, help='nummber of maximum epochs to run')
     parser.add_argument("--max_len", default=512, type=int, help='max len of input')
     parser.add_argument("--gpu", default='0', type=str, help='GPUs to use')
@@ -45,7 +46,7 @@ def get_params():
     parser.add_argument("--other_comments_path", default='data/extra_data_other_comments.csv', type=str, help='other comments data for a video')
     parser.add_argument("--add_other_comments", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--other_comments_token_count", default=300, type=int, help="number of token to consider of transcript")
-    parser.add_argument("--add_video", default=False, type=ast.literal_eval, help="add video as context")
+    parser.add_argument("--add_video", default=True, type=ast.literal_eval, help="add video as context")
     parser.add_argument("--video_path", default='data/videos/', type=str, help='directory which contains videos')
     parser.add_argument("--multitask", default=True, type=ast.literal_eval, help="Flag for multitask classificaiton")
     parser.add_argument("--remove_none", default=False, type=ast.literal_eval, help="Flag for removing Non-Hate in multilabel classification")
@@ -100,13 +101,14 @@ def save_checkpoint(state, args, name, filename='checkpoint.pth.tar', is_best=Fa
         # shutil.copyfile(filename, best_filename)
 
 def collate_fn(batch):
-    comments, titles, descriptions, transcriptions, other_comments, frames, label_binary, label_multilabel = zip(*batch)
+    comments, titles, descriptions, transcriptions, other_comments, vis_emb, label_binary, label_multilabel = zip(*batch)
 
-    max_frames = max([image.size(1) for image in frames])
-    frames = torch.tensor(np.array([F.pad(image, [0, 0, 0, 0, 0, max_frames - image.size(1)]).numpy() for image in frames]))
+    # max_frames = max([image.size(1) for image in frames])
+    # frames = torch.tensor(np.array([F.pad(image, [0, 0, 0, 0, 0, max_frames - image.size(1)]).numpy() for image in frames]))
+    vis_emb = torch.stack(list(vis_emb), dim=0)
     label_binary = torch.tensor(label_binary).reshape(-1, 1)
     label_multilabel = torch.stack(list(label_multilabel), dim=0)
-    return [comments, titles, descriptions, transcriptions, other_comments, frames, label_binary, label_multilabel]
+    return [comments, titles, descriptions, transcriptions, other_comments, vis_emb, label_binary, label_multilabel]
 
 
 def get_data_loaders(args, phase):
@@ -115,23 +117,23 @@ def get_data_loaders(args, phase):
     dataloader = DataLoader(data, collate_fn=collate_fn, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers)
     return dataloader
 
-def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, lf_model, vision_model, comment_model, multitaskloss_instance, args):
+def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, lf_model, comment_model, multitaskloss_instance, args):
     
     lf_model.lf_model.train()
-    vision_model.model.eval()
+    # vision_model.model.eval()
     comment_model.train()
     multitaskloss_instance.train()
 
     
     losses = AverageMeter()
     acces = AverageMeter()
-    for itr, (comment, title, description, transcription, other_comments, frames, label_binary, label_multilabel) in enumerate(train_loader):
+    for itr, (comment, title, description, transcription, other_comments, vis_emb, label_binary, label_multilabel) in enumerate(train_loader):
         label_binary = label_binary.to(device)
         label_multilabel = label_multilabel.to(device)
 
-        vis_emb = None
-        if args.add_video:
-            vis_emb = vision_model.get_embeddings(frames)
+        # vis_emb = None
+        # if args.add_video:
+            # vis_emb = vision_model.get_embeddings(frames)
         
         output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vis_emb)
 
@@ -161,10 +163,10 @@ def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, l
 
     return losses.avg, acces.avg
         
-def eval_one_epoch(test_loader, epoch, phase, device, criterions, lf_model, vision_model, comment_model, multitaskloss_instance, args):
+def eval_one_epoch(test_loader, epoch, phase, device, criterions, lf_model, comment_model, multitaskloss_instance, args):
 
     lf_model.lf_model.eval()
-    vision_model.model.eval()
+    # vision_model.model.eval()
     comment_model.eval()
     multitaskloss_instance.eval()
 
@@ -174,13 +176,13 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterions, lf_model, visi
     preds = []
     labels = []
     with torch.no_grad():
-        for itr, (comment, title, description, transcription, other_comments, frames, label_binary, label_multilabel) in enumerate(test_loader):
+        for itr, (comment, title, description, transcription, other_comments, vis_emb, label_binary, label_multilabel) in enumerate(test_loader):
             label_binary = label_binary.to(device)
             label_multilabel = label_multilabel.to(device)
 
-            vis_emb = None
-            if args.add_video:
-                vis_emb = vision_model.get_embeddings(frames)
+            # vis_emb = None
+            # if args.add_video:
+                # vis_emb = vision_model.get_embeddings(frames)
 
             output = comment_model(lf_model.get_embeddings(comment, title, description, transcription, other_comments)[1], vis_emb)
 
@@ -226,7 +228,7 @@ def main():
     args = get_params()
     run = wandb.init(project="vision_models", entity='is_project')
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-    device = torch.device("cuda")
+    device = "mps" if getattr(torch,'has_mps',False) else "gpu" if torch.cuda.is_available() else "cpu"
     print('number of available devices:', torch.cuda.device_count())
 
     train_loader = get_data_loaders(args, 'train')
@@ -235,7 +237,7 @@ def main():
     print('obtained dataloaders')
 
     lf_model = LFEmbeddingModule(args, device)
-    vision_model = VisionModule(args, device)
+    # vision_model = VisionModule(args, device)
     comment_model = CommentModel(args).to(device)
     multitaskloss_instance = MultiTaskLoss(n_tasks=2, reduction="sum")
 
@@ -263,8 +265,8 @@ def main():
     train_loss = 0
     eval_loss = 0
     for epoch in range(args.max_epochs):
-        train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterions, optimizer, lf_model, vision_model, comment_model, multitaskloss_instance, args)
-        eval_loss, eval_acc, _, _ = eval_one_epoch(validation_loader, epoch, 'Eval', device, criterions, lf_model, vision_model, comment_model, multitaskloss_instance, args)
+        train_loss, train_acc = train_one_epoch(train_loader, epoch, 'Train', device, criterions, optimizer, lf_model, comment_model, multitaskloss_instance, args)
+        eval_loss, eval_acc, _, _ = eval_one_epoch(validation_loader, epoch, 'Eval', device, criterions, lf_model, comment_model, multitaskloss_instance, args)
         print('Epoch-{:<3d} Train: loss {:.4f}\taccu {:.4f}\tEval: loss {:.4f}\taccu {:.4f}'
                 .format(epoch, train_loss, train_acc, eval_loss, eval_acc))
         wandb.log({'Train Loss': train_loss, 'Train Acc': train_acc, 'Eval Loss': eval_loss, 'Eval Acc': eval_acc})
@@ -290,7 +292,7 @@ def main():
         }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
         
     #load_weights('best')
-    test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterions, lf_model, vision_model, comment_model, multitaskloss_instance, args)
+    test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterions, lf_model, comment_model, multitaskloss_instance, args)
     print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
     np.save(f'{args.work_dir}/test_preds_{run.name}.npy', np.array(test_pred))
     np.save(f'{args.work_dir}/test_labels_{run.name}.npy', np.array(test_label))

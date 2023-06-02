@@ -65,29 +65,29 @@ class LFEmbeddingModule(nn.Module):
         embedding = self.lf_model(indexed_cs)
         return embedding
 
-class VisionModule(nn.Module):
-    def __init__(self, args, device):
-        super(VisionModule, self).__init__()
-        self.args = args
-        self.device = device
-        pretrained_model = torchvision.models.video.r3d_18(pretrained=True)
-        self.model = torch.nn.Sequential(*(list(pretrained_model.children())[:-1])).to(device)
-        for param in self.model.parameters():
-            param.requires_grad = False
+# class VisionModule(nn.Module):
+#     def __init__(self, args, device):
+#         super(VisionModule, self).__init__()
+#         self.args = args
+#         self.device = device
+#         pretrained_model = torchvision.models.video.r3d_18(pretrained=True)
+#         self.model = torch.nn.Sequential(*(list(pretrained_model.children())[:-1])).to(device)
+#         for param in self.model.parameters():
+#             param.requires_grad = False
 
-    def get_embeddings(self, frames):
-        frames = frames.to(self.device)
-        vision_embedding = []
-        for frame in list(frames):
-            sum_frame = frame.sum(dim=(0, 2, 3))
-            num_zero_indices = (sum_frame == 0).nonzero().flatten().shape[0]
-            final_frame = frame[:, :(-num_zero_indices if num_zero_indices else frame.shape[1]), :, :]
-            _vis_emb = self.model(final_frame[None, ...])
-            _vis_emb = torch.flatten(_vis_emb, start_dim=1)
-            vision_embedding.append(_vis_emb)
+#     def get_embeddings(self, frames):
+#         frames = frames.to(self.device)
+#         vision_embedding = []
+#         for frame in list(frames):
+#             sum_frame = frame.sum(dim=(0, 2, 3))
+#             num_zero_indices = (sum_frame == 0).nonzero().flatten().shape[0]
+#             final_frame = frame[:, :(-num_zero_indices if num_zero_indices else frame.shape[1]), :, :]
+#             _vis_emb = self.model(final_frame[None, ...])
+#             _vis_emb = torch.flatten(_vis_emb, start_dim=1)
+#             vision_embedding.append(_vis_emb)
 
-        vision_embedding = torch.cat(vision_embedding)
-        return vision_embedding
+#         vision_embedding = torch.cat(vision_embedding)
+#         return vision_embedding
 
         
 class CommentModel(nn.Module):

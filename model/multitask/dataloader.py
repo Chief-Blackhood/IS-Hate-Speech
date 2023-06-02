@@ -4,6 +4,7 @@ import torch
 import torch.utils.data as data
 import pandas as pd
 import numpy as np
+import pickle
 
 from opencv_transforms.transforms import (
     Compose, Normalize, Resize, CenterCrop, ToTensor
@@ -95,38 +96,47 @@ class HateSpeechData(data.Dataset):
         transcript = self.comments['transcript'][index] if self.args.add_transcription else ''
         other_comment = self.comments['key_phrases_other_comments'][index] if self.args.add_other_comments else ''
 
-        frame_data = torch.zeros(NCHANNELS, 1, CROP_SIZE, CROP_SIZE)
+        # frame_data = torch.zeros(NCHANNELS, 1, CROP_SIZE, CROP_SIZE)
         if self.args.add_video:
-            frame_data = []
-            filename = os.path.join(self.args.video_path, self.comments['source'][index], self.comments['videoID'][index])
-            vidcap = cv2.VideoCapture(f"{filename}.mp4")
-            # total_frames = vidcap.get(cv2.CAP_PROP_FRAME_COUNT)
-            frame_rate = vidcap.get(cv2.CAP_PROP_FPS)
-            frames_step = frame_rate * NTH_SECOND
-            # frames_step = total_frames // NUM_FRAMES
-            # for i in range(NUM_FRAMES):
-            #     vidcap.set(1, i * frames_step)
+            # frame_data = []
+            # filename = os.path.join(self.args.video_path, self.comments['source'][index], self.comments['videoID'][index])
+            # vidcap = cv2.VideoCapture(f"{filename}.mp4")
+            # # total_frames = vidcap.get(cv2.CAP_PROP_FRAME_COUNT)
+            # frame_rate = vidcap.get(cv2.CAP_PROP_FPS)
+            # frames_step = frame_rate * NTH_SECOND
+            # # frames_step = total_frames // NUM_FRAMES
+            # # for i in range(NUM_FRAMES):
+            # #     vidcap.set(1, i * frames_step)
+            # #     ret, image = vidcap.read()
+            # #     if ret:
+            # #         image = self.transform(image)
+            # #         image = image[None, ...]
+            # #         frame_data.append(image)
+
+            # num_frames = 0
+            # while vidcap.isOpened():
             #     ret, image = vidcap.read()
             #     if ret:
             #         image = self.transform(image)
             #         image = image[None, ...]
             #         frame_data.append(image)
+            #         num_frames += 1
+            #         vidcap.set(cv2.CAP_PROP_POS_FRAMES, num_frames * frames_step)
+            #     else:
+            #         vidcap.release()
+            #         break
 
-            num_frames = 0
-            while vidcap.isOpened():
-                ret, image = vidcap.read()
-                if ret:
-                    image = self.transform(image)
-                    image = image[None, ...]
-                    frame_data.append(image)
-                    num_frames += 1
-                    vidcap.set(cv2.CAP_PROP_POS_FRAMES, num_frames * frames_step)
-                else:
-                    vidcap.release()
-                    break
-
-            frame_data = torch.cat(frame_data) # Number of frames, channels, image width, image height
-            frame_data = torch.movedim(frame_data, 1, 0) # channels, Number of frames, image width, image height
+            # frame_data = torch.cat(frame_data) # Number of frames, channels, image width, image height
+            # frame_data = torch.movedim(frame_data, 1, 0) # channels, Number of frames, image width, image height
+            id = self.comments['id'][index]
+            with open(f'{self.args.clip_embeedings_path}/{id}.pickle', 'rb') as handle:
+                data = pickle.load(handle)
+            similarities = data['similarities']
+            print(id, data['video_features'].shape)
+            _, best_photo_idx = similarities.topk(NUM_FRAMES, dim=0)
+            
+            video_embeddings = data['video_features'][best_photo_idx].squeeze()
+            vis_emb = torch.mean(video_embeddings, dim=0)
             
         target_multilabel = np.zeros(5, dtype=float)
         if self.args.remove_none:
@@ -134,8 +144,10 @@ class HateSpeechData(data.Dataset):
         labels = self.comments['hate_towards_whom'][index].split(',')
         for label in labels:
             label = label.strip()
+            if label == '' or len(label) == 0:
+                label = 'None'
             target_multilabel[self.mapping[label]] = 1
         target_multilabel = torch.FloatTensor(target_multilabel)
         target_binary = torch.FloatTensor([self.comments['label'][index]])
         
-        return comment, title, desc, transcript, other_comment, frame_data, target_binary, target_multilabel
+        return comment, title, desc, transcript, other_comment, vis_emb, target_binary, target_multilabel
