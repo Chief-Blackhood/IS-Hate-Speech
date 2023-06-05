@@ -228,7 +228,7 @@ def main():
     args = get_params()
     run = wandb.init(project="vision_models", entity='is_project')
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-    device = "mps" if getattr(torch,'has_mps',False) else "gpu" if torch.cuda.is_available() else "cpu"
+    device = "mps" if getattr(torch,'has_mps',False) else "cuda" if torch.cuda.is_available() else "cpu"
     print('number of available devices:', torch.cuda.device_count())
 
     train_loader = get_data_loaders(args, 'train')

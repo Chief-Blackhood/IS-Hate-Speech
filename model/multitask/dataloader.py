@@ -131,8 +131,11 @@ class HateSpeechData(data.Dataset):
             id = self.comments['id'][index]
             with open(f'{self.args.clip_embeedings_path}/{id}.pickle', 'rb') as handle:
                 data = pickle.load(handle)
+            data['similarities'] = data['similarities'].to('cpu').to('cuda')
+            data['video_features'] = data['video_features'].to('cpu').to('cuda')
+            
             similarities = data['similarities']
-            print(id, data['video_features'].shape)
+
             _, best_photo_idx = similarities.topk(NUM_FRAMES, dim=0)
             
             video_embeddings = data['video_features'][best_photo_idx].squeeze()
