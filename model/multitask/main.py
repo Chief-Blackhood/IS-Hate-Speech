@@ -49,6 +49,7 @@ def get_params():
     parser.add_argument("--add_video", default=True, type=ast.literal_eval, help="add video as context")
     parser.add_argument("--video_path", default='data/videos/', type=str, help='directory which contains videos')
     parser.add_argument("--multitask", default=True, type=ast.literal_eval, help="Flag for multitask classificaiton")
+    parser.add_argument("--debug", default=False, type=ast.literal_eval, help="Flag for debugging")
     parser.add_argument("--remove_none", default=False, type=ast.literal_eval, help="Flag for removing Non-Hate in multilabel classification")
     
     return parser.parse_args()
@@ -122,12 +123,14 @@ def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, l
     lf_model.lf_model.train()
     # vision_model.model.eval()
     comment_model.train()
-    if args.mulitask:
+    if args.multitask:
         multitaskloss_instance.train()
 
     
     losses = AverageMeter()
     acces = AverageMeter()
+    if args.debug:
+        print("Comment Model weights before epoch: ", comment_model.fc_multilabel[0].weight)
     for itr, (comment, title, description, transcription, other_comments, vis_emb, label_binary, label_multilabel) in enumerate(train_loader):
         label_binary = label_binary.to(device)
         label_multilabel = label_multilabel.to(device)
@@ -143,7 +146,7 @@ def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, l
 
         optimizer.zero_grad()
         
-        if args.mulitask:
+        if args.multitask:
             losses_stack = torch.stack([loss_multilabel, loss_binary])
             multitaskloss = multitaskloss_instance(losses_stack)
             multitaskloss.backward()
@@ -165,6 +168,9 @@ def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, l
                 'loss {loss.val:.4f} ({loss.avg:.4f})\t'
                 'accu {acc.val:.3f} ({acc.avg:.3f})\t'.format(
                 epoch, itr, len(train_loader), loss=losses, acc=acces))
+
+    if args.debug:
+        print("Comment Model weights after epoch: ", comment_model.fc_multilabel[0].weight)
 
     return losses.avg, acces.avg
         
@@ -303,8 +309,8 @@ def main():
     #load_weights('best')
     test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterions, lf_model, comment_model, multitaskloss_instance, args)
     print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
-    np.save(f'{args.work_dir}/test_preds_{run.name}.npy', np.array(test_pred))
-    np.save(f'{args.work_dir}/test_labels_{run.name}.npy', np.array(test_label))
+    np.save(f'{args.work_dir}/test_preds_{run.name}.npy', np.array(test_pred, dtype=object))
+    np.save(f'{args.work_dir}/test_labels_{run.name}.npy', np.array(test_label, dtype=object))
 
 if __name__ == "__main__":
     main()
