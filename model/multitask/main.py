@@ -122,7 +122,8 @@ def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, l
     lf_model.lf_model.train()
     # vision_model.model.eval()
     comment_model.train()
-    multitaskloss_instance.train()
+    if args.mulitask:
+        multitaskloss_instance.train()
 
     
     losses = AverageMeter()
@@ -140,11 +141,17 @@ def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, l
         loss_multilabel = criterions[0](output[0], label_multilabel)        
         loss_binary = criterions[1](output[1], label_binary)      
 
-        losses_stack = torch.stack([loss_multilabel, loss_binary])
-        multitaskloss = multitaskloss_instance(losses_stack)
-        
         optimizer.zero_grad()
-        multitaskloss.backward()
+        
+        if args.mulitask:
+            losses_stack = torch.stack([loss_multilabel, loss_binary])
+            multitaskloss = multitaskloss_instance(losses_stack)
+            multitaskloss.backward()
+            losses.update(multitaskloss.data.item(), args.batch_size)
+        else:
+            loss_binary.backward()
+            losses.update(loss_binary.data.item(), args.batch_size)
+        
         optimizer.step()
 
         output_binary = np.round(output[1].detach().cpu().numpy())
@@ -153,8 +160,6 @@ def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, l
         acc = accuracy(output_binary, label_binary)
         acces.update(acc, args.batch_size)
         
-        losses.update(multitaskloss.data.item(), args.batch_size)
-
         if itr % 25 == 0:
             print(phase + ' Epoch-{:<3d} Iter-{:<3d}/{:<3d}\t'
                 'loss {loss.val:.4f} ({loss.avg:.4f})\t'
@@ -189,8 +194,12 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterions, lf_model, comm
             loss_multilabel = criterions[0](output[0], label_multilabel)        
             loss_binary = criterions[1](output[1], label_binary)      
 
-            losses_stack = torch.stack([loss_multilabel, loss_binary])
-            multitaskloss = multitaskloss_instance(losses_stack)
+            if args.multitask:
+                losses_stack = torch.stack([loss_multilabel, loss_binary])
+                multitaskloss = multitaskloss_instance(losses_stack)
+                losses.update(multitaskloss.data.item(), args.batch_size)
+            else:
+                losses.update(loss_binary.data.item(), args.batch_size)
 
             output_binary = output[1].detach().cpu().numpy()
             output_multilabel = output[0].detach().cpu().numpy()
@@ -200,8 +209,6 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterions, lf_model, comm
         
             acc = accuracy(np.round(output_binary), label_binary)
             acces.update(acc, args.batch_size)
-
-            losses.update(multitaskloss.data.item(), args.batch_size)
 
             preds.append(list([output_binary.tolist(), output_multilabel.tolist()]))
             labels.append(list([label_binary.tolist(), label_multilabel.tolist()]))
@@ -249,8 +256,10 @@ def main():
     wandb.watch(comment_model)
 
     params = []
-    for model in [lf_model.lf_model, comment_model, multitaskloss_instance]:
+    for model in [lf_model.lf_model, comment_model]:
         params += list(model.parameters())
+    if args.multitask:
+        params += list(multitaskloss_instance.parameters())
 
     optimizer = optim.Adam(params, lr = args.lr)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
