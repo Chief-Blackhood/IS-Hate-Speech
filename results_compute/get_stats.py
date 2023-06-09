@@ -2,20 +2,16 @@ from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_sc
 import os
 import numpy as np
 
-NPY_FILE_PATH = "../npy_files/27May"
+NPY_FILE_PATH = "../npy_files/7Jun_vision"
 
 filenames = os.listdir(path=NPY_FILE_PATH)
 filenames = sorted(filenames, key=lambda x: x.split('_')[-1])
+filenames = list(set([filename.split('_')[2] for filename in filenames]))
 
-file_count=0
-while file_count < len(filenames):
-    run_name = filenames[file_count].split('.')[0].split('_')[-1]
-    if 'labels' in filenames[file_count]:
-        labels_data = np.load(f'{NPY_FILE_PATH}/{filenames[file_count]}', allow_pickle=True)
-        preds_data = np.load(f'{NPY_FILE_PATH}/{filenames[file_count+1]}', allow_pickle=True)
-    else:
-        labels_data = np.load(f'{NPY_FILE_PATH}/{filenames[file_count+1]}', allow_pickle=True)
-        preds_data = np.load(f'{NPY_FILE_PATH}/{filenames[file_count]}', allow_pickle=True)
+for filename in filenames:
+    run_name = filename.split('.')[0]
+    labels_data = np.load(f'{NPY_FILE_PATH}/test_labels_{filename}', allow_pickle=True)
+    preds_data = np.load(f'{NPY_FILE_PATH}/test_preds_{filename}', allow_pickle=True)
     labels = []
     preds = []
     for i in range(len(labels_data)):
@@ -36,4 +32,3 @@ while file_count < len(filenames):
     print("     F1 score:", f1_score(labels, preds, pos_label=1))
     print("     F1 score for (Non Hate):", f1_score(labels, preds, pos_label=0))
     print("     Accuracy:", accuracy_score(labels, preds))
-    file_count+=2

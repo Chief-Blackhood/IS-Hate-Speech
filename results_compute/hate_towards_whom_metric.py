@@ -3,10 +3,11 @@ import sys
 import numpy as np
 from sklearn.metrics import hamming_loss, accuracy_score, precision_score, recall_score, f1_score
 
-NPY_FILE_PATH = "../npy_files/27May"
+NPY_FILE_PATH = "../npy_files/7Jun_vision"
 
 filenames = os.listdir(path=NPY_FILE_PATH)
 filenames = sorted(filenames, key=lambda x: x.split('_')[-1])
+filenames = list(set([filename.split('_')[2] for filename in filenames]))
 
 def hamming_score(y_true, y_pred):
     acc_list = []
@@ -23,35 +24,45 @@ def hamming_score(y_true, y_pred):
     
     return np.mean(acc_list)
 
-file_count = 0
-while file_count < len(filenames):
-        run_name = filenames[file_count].split('.')[0].split('_')[-1]
-        if 'labels' in filenames[file_count]:
-                labels_data = np.load(f'{NPY_FILE_PATH}/{filenames[file_count]}', allow_pickle=True)
-                preds_data = np.load(f'{NPY_FILE_PATH}/{filenames[file_count+1]}', allow_pickle=True)
-        else:
-                labels_data = np.load(f'{NPY_FILE_PATH}/{filenames[file_count+1]}', allow_pickle=True)
-                preds_data = np.load(f'{NPY_FILE_PATH}/{filenames[file_count]}', allow_pickle=True)
+
+for filename in filenames:
+        run_name = filename.split('.')[0]
+        print(f"The metrics for {run_name} run are:")
+        labels_data = np.load(f'{NPY_FILE_PATH}/test_labels_{filename}', allow_pickle=True)
+        preds_data = np.load(f'{NPY_FILE_PATH}/test_preds_{filename}', allow_pickle=True)
+        eval_labels_data = np.load(f'{NPY_FILE_PATH}/eval_labels_{filename}', allow_pickle=True)
+        eval_preds_data = np.load(f'{NPY_FILE_PATH}/eval_preds_{filename}', allow_pickle=True)
         labels = []
         preds = []
+        eval_labels = []
+        eval_preds = []
         for i in range(len(labels_data)):
                 for j in range(len(labels_data[i])):
                         labels.append(labels_data[i][j][:5])
                         preds.append(preds_data[i][j][:5])
+        for i in range(len(eval_labels_data)):
+                for j in range(len(eval_labels_data[i])):
+                        eval_labels.append(eval_labels_data[i][j][:5])
+                        eval_preds.append(eval_preds_data[i][j][:5])
         labels = np.array(labels)
         preds = np.array(preds)
+        eval_labels = np.array(eval_labels)
+        eval_preds = np.array(eval_preds)
         max_hamming_score = 0
         max_thres = 0
         for thresh in np.linspace(0, 1, 11):
-                copy_preds = preds.copy()
+                copy_preds = eval_preds.copy()
                 copy_preds[copy_preds >= thresh] = 1
                 copy_preds[copy_preds < thresh] = 0
-                if max_hamming_score < hamming_score(labels, copy_preds):
-                        max_hamming_score = hamming_score(labels, copy_preds)
+                if max_hamming_score < hamming_score(eval_labels, copy_preds):
+                        max_hamming_score = hamming_score(eval_labels, copy_preds)
                         max_thres = thresh
-                        max_hamming_loss = hamming_loss(labels, copy_preds)
-        print(f"The metrics for {run_name} run are:")
-        print("Thresh:", max_thres, "\tHamming Loss:", max_hamming_loss, "\tHamming Score:", max_hamming_score)
+                        # max_hamming_loss = hamming_loss(eval_labels, copy_preds)
+        copy_preds = preds.copy()
+        copy_preds[copy_preds >= max_thres] = 1
+        copy_preds[copy_preds < max_thres] = 0                
+        
+        print("Thresh:", max_thres, "\tHamming Loss:", hamming_loss(copy_preds, labels), "\tHamming Score:", hamming_score(copy_preds, labels))
         preds[preds >= 0.5] = 1
         preds[preds < 0.5] = 0
         
@@ -59,4 +70,3 @@ while file_count < len(filenames):
         for i in range(0, 5):
                 print(f"{mapping[i]} Precision: {precision_score(labels[:, i], preds[:, i])} Recall: {recall_score(labels[:, i], preds[:, i])} F1 Score: {f1_score(labels[:, i], preds[:, i])}")
         print()
-        file_count += 2

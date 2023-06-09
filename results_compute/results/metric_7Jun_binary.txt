@@ -1,0 +1,144 @@
+
+The metrics for bright-bee-166 run are:
+     Precision: 0.8270042194092827
+     Precision for (Non Hate): 0.6127659574468085
+     Recall: 0.6829268292682927
+     Recall for (Non Hate): 0.7783783783783784
+     F1 score: 0.7480916030534351
+     F1 score for (Non Hate): 0.6857142857142857
+     Accuracy: 0.7203389830508474
+
+The metrics for cool-field-158 run are:
+     Precision: 0.8704453441295547
+     Precision for (Non Hate): 0.68
+     Recall: 0.7491289198606271
+     Recall for (Non Hate): 0.827027027027027
+     F1 score: 0.805243445692884
+     F1 score for (Non Hate): 0.7463414634146341
+     Accuracy: 0.7796610169491526
+
+The metrics for dazzling-plasma-158 run are:
+     Precision: 0.875
+     Precision for (Non Hate): 0.6681034482758621
+     Recall: 0.7317073170731707
+     Recall for (Non Hate): 0.8378378378378378
+     F1 score: 0.7969639468690702
+     F1 score for (Non Hate): 0.7434052757793765
+     Accuracy: 0.7733050847457628
+
+The metrics for floral-gorge-166 run are:
+     Precision: 0.8516949152542372
+     Precision for (Non Hate): 0.635593220338983
+     Recall: 0.7003484320557491
+     Recall for (Non Hate): 0.8108108108108109
+     F1 score: 0.7686424474187381
+     F1 score for (Non Hate): 0.7125890736342043
+     Accuracy: 0.7436440677966102
+
+The metrics for glorious-voice-158 run are:
+     Precision: 0.7949790794979079
+     Precision for (Non Hate): 0.5836909871244635
+     Recall: 0.662020905923345
+     Recall for (Non Hate): 0.7351351351351352
+     F1 score: 0.7224334600760457
+     F1 score for (Non Hate): 0.6507177033492824
+     Accuracy: 0.690677966101695
+
+The metrics for hardy-glitter-158 run are:
+     Precision: 0.8055555555555556
+     Precision for (Non Hate): 0.6181818181818182
+     Recall: 0.7073170731707317
+     Recall for (Non Hate): 0.7351351351351352
+     F1 score: 0.7532467532467532
+     F1 score for (Non Hate): 0.671604938271605
+     Accuracy: 0.7182203389830508
+
+The metrics for legendary-flower-158 run are:
+     Precision: 0.7837837837837838
+     Precision for (Non Hate): 0.6056338028169014
+     Recall: 0.7073170731707317
+     Recall for (Non Hate): 0.6972972972972973
+     F1 score: 0.7435897435897435
+     F1 score for (Non Hate): 0.6482412060301507
+     Accuracy: 0.7033898305084746
+
+The metrics for pleasant-aardvark-166 run are:
+     Precision: 0.7949640287769785
+     Precision for (Non Hate): 0.6597938144329897
+     Recall: 0.7700348432055749
+     Recall for (Non Hate): 0.6918918918918919
+     F1 score: 0.7823008849557522
+     F1 score for (Non Hate): 0.6754617414248022
+     Accuracy: 0.739406779661017
+
+The metrics for rare-waterfall-166 run are:
+     Precision: 0.8228782287822878
+     Precision for (Non Hate): 0.681592039800995
+     Recall: 0.7770034843205574
+     Recall for (Non Hate): 0.7405405405405405
+     F1 score: 0.7992831541218638
+     F1 score for (Non Hate): 0.7098445595854921
+     Accuracy: 0.7627118644067796
+
+The metrics for skilled-moon-168 run are:
+     Precision: 0.8212765957446808
+     Precision for (Non Hate): 0.6033755274261603
+     Recall: 0.6724738675958188
+     Recall for (Non Hate): 0.772972972972973
+     F1 score: 0.7394636015325671
+     F1 score for (Non Hate): 0.6777251184834122
+     Accuracy: 0.711864406779661
+
+The metrics for stellar-bird-166 run are:
+     Precision: 0.8761061946902655
+     Precision for (Non Hate): 0.6382113821138211
+     Recall: 0.6898954703832753
+     Recall for (Non Hate): 0.8486486486486486
+     F1 score: 0.7719298245614036
+     F1 score for (Non Hate): 0.7285382830626449
+     Accuracy: 0.7521186440677966
+
+The metrics for stellar-sea-158 run are:
+     Precision: 0.8821138211382114
+     Precision for (Non Hate): 0.6902654867256637
+     Recall: 0.7560975609756098
+     Recall for (Non Hate): 0.8432432432432433
+     F1 score: 0.8142589118198874
+     F1 score for (Non Hate): 0.7591240875912408
+     Accuracy: 0.7902542372881356
+
+The metrics for stilted-dragon-166 run are:
+     Precision: 0.8347457627118644
+     Precision for (Non Hate): 0.6186440677966102
+     Recall: 0.686411149825784
+     Recall for (Non Hate): 0.7891891891891892
+     F1 score: 0.7533460803059273
+     F1 score for (Non Hate): 0.6935866983372921
+     Accuracy: 0.7266949152542372
+
+The metrics for sweet-bee-166 run are:
+     Precision: 0.8585365853658536
+     Precision for (Non Hate): 0.5842696629213483
+     Recall: 0.6132404181184669
+     Recall for (Non Hate): 0.8432432432432433
+     F1 score: 0.7154471544715446
+     F1 score for (Non Hate): 0.6902654867256638
+     Accuracy: 0.7033898305084746
+
+The metrics for wandering-gorge-158 run are:
+     Precision: 0.7945205479452054
+     Precision for (Non Hate): 0.5533596837944664
+     Recall: 0.6062717770034843
+     Recall for (Non Hate): 0.7567567567567568
+     F1 score: 0.6877470355731226
+     F1 score for (Non Hate): 0.639269406392694
+     Accuracy: 0.6652542372881356
+
+The metrics for wild-glitter-158 run are:
+     Precision: 0.7662835249042146
+     Precision for (Non Hate): 0.5876777251184834
+     Recall: 0.6968641114982579
+     Recall for (Non Hate): 0.6702702702702703
+     F1 score: 0.7299270072992701
+     F1 score for (Non Hate): 0.6262626262626262
+     Accuracy: 0.6864406779661016
