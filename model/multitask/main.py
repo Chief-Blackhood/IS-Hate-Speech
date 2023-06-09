@@ -46,7 +46,7 @@ def get_params():
     parser.add_argument("--other_comments_path", default='data/extra_data_other_comments.csv', type=str, help='other comments data for a video')
     parser.add_argument("--add_other_comments", default=False, type=ast.literal_eval, help="add description as context")
     parser.add_argument("--other_comments_token_count", default=300, type=int, help="number of token to consider of transcript")
-    parser.add_argument("--add_video", default=True, type=ast.literal_eval, help="add video as context")
+    parser.add_argument("--add_video", default=False, type=ast.literal_eval, help="add video as context")
     parser.add_argument("--video_path", default='data/videos/', type=str, help='directory which contains videos')
     parser.add_argument("--multitask", default=True, type=ast.literal_eval, help="Flag for multitask classificaiton")
     parser.add_argument("--debug", default=False, type=ast.literal_eval, help="Flag for debugging")
@@ -253,8 +253,12 @@ def main():
     # vision_model = VisionModule(args, device)
     comment_model = CommentModel(args).to(device)
     multitaskloss_instance = MultiTaskLoss(n_tasks=2, reduction="sum")
-
-    criterions = [nn.BCEWithLogitsLoss().to(device), nn.BCELoss().to(device)]
+    
+    total = 210 + 243 + 1128 + 1002 + 3065
+    pos_weight = torch.tensor([(total - 210)/210, (total - 243)/243, (total - 1128)/1128, (total - 1002)/1002, (total - 3065)/3065])
+    criterions = [nn.BCEWithLogitsLoss(pos_weight=pos_weight).to(device), nn.BCELoss().to(device)]
+    
+    # criterions = [nn.BCEWithLogitsLoss().to(device), nn.BCELoss().to(device)]
 
     config = wandb.config
     config.lr = args.lr
