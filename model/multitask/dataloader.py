@@ -97,6 +97,7 @@ class HateSpeechData(data.Dataset):
         other_comment = self.comments['key_phrases_other_comments'][index] if self.args.add_other_comments else ''
 
         # frame_data = torch.zeros(NCHANNELS, 1, CROP_SIZE, CROP_SIZE)
+        vis_emb = torch.zeros(VISUAL_EMBEDDING_SIZE)
         if self.args.add_video:
             # frame_data = []
             # filename = os.path.join(self.args.video_path, self.comments['source'][index], self.comments['videoID'][index])
