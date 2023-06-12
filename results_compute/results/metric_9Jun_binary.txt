@@ -1,0 +1,144 @@
+
+The metrics for divine-wave-212 run are:
+     Precision: 0.7322834645669292
+     Precision for (Non Hate): 0.536697247706422
+     Recall: 0.6480836236933798
+     Recall for (Non Hate): 0.6324324324324324
+     F1 score: 0.6876155268022182
+     F1 score for (Non Hate): 0.5806451612903226
+     Accuracy: 0.6419491525423728
+
+The metrics for fiery-tree-220 run are:
+     Precision: 0.8626609442060086
+     Precision for (Non Hate): 0.6401673640167364
+     Recall: 0.7003484320557491
+     Recall for (Non Hate): 0.827027027027027
+     F1 score: 0.773076923076923
+     F1 score for (Non Hate): 0.7216981132075472
+     Accuracy: 0.75
+
+The metrics for frosty-cherry-213 run are:
+     Precision: 0.0
+     Precision for (Non Hate): 0.3919491525423729
+     Recall: 0.0
+     Recall for (Non Hate): 1.0
+     F1 score: 0.0
+     F1 score for (Non Hate): 0.5631659056316591
+     Accuracy: 0.3919491525423729
+
+The metrics for electric-planet-212 run are:
+     Precision: 0.8232931726907631
+     Precision for (Non Hate): 0.6322869955156951
+     Recall: 0.7142857142857143
+     Recall for (Non Hate): 0.7621621621621621
+     F1 score: 0.7649253731343284
+     F1 score for (Non Hate): 0.6911764705882353
+     Accuracy: 0.7330508474576272
+
+The metrics for sparkling-resonance-217 run are:
+     Precision: 0.0
+     Precision for (Non Hate): 0.3919491525423729
+     Recall: 0.0
+     Recall for (Non Hate): 1.0
+     F1 score: 0.0
+     F1 score for (Non Hate): 0.5631659056316591
+     Accuracy: 0.3919491525423729
+
+The metrics for sandy-fire-217 run are:
+     Precision: 0.7674418604651163
+     Precision for (Non Hate): 0.5841121495327103
+     Recall: 0.6898954703832753
+     Recall for (Non Hate): 0.6756756756756757
+     F1 score: 0.7266055045871559
+     F1 score for (Non Hate): 0.6265664160401003
+     Accuracy: 0.684322033898305
+
+The metrics for giddy-cosmos-212 run are:
+     Precision: 0.8089887640449438
+     Precision for (Non Hate): 0.6536585365853659
+     Recall: 0.7526132404181185
+     Recall for (Non Hate): 0.7243243243243244
+     F1 score: 0.7797833935018051
+     F1 score for (Non Hate): 0.6871794871794872
+     Accuracy: 0.7415254237288136
+
+The metrics for apricot-frog-220 run are:
+     Precision: 0.8854625550660793
+     Precision for (Non Hate): 0.6489795918367347
+     Recall: 0.7003484320557491
+     Recall for (Non Hate): 0.8594594594594595
+     F1 score: 0.7821011673151751
+     F1 score for (Non Hate): 0.7395348837209302
+     Accuracy: 0.7627118644067796
+
+The metrics for floral-surf-227 run are:
+     Precision: 0.867579908675799
+     Precision for (Non Hate): 0.616600790513834
+     Recall: 0.662020905923345
+     Recall for (Non Hate): 0.8432432432432433
+     F1 score: 0.75098814229249
+     F1 score for (Non Hate): 0.7123287671232876
+     Accuracy: 0.7330508474576272
+
+The metrics for royal-morning-217 run are:
+     Precision: 0.8445378151260504
+     Precision for (Non Hate): 0.6324786324786325
+     Recall: 0.7003484320557491
+     Recall for (Non Hate): 0.8
+     F1 score: 0.7657142857142857
+     F1 score for (Non Hate): 0.7064439140811456
+     Accuracy: 0.739406779661017
+
+The metrics for stellar-shadow-226 run are:
+     Precision: 0.9061032863849765
+     Precision for (Non Hate): 0.637065637065637
+     Recall: 0.6724738675958188
+     Recall for (Non Hate): 0.8918918918918919
+     F1 score: 0.772
+     F1 score for (Non Hate): 0.7432432432432432
+     Accuracy: 0.7584745762711864
+
+The metrics for flowing-sun-220 run are:
+     Precision: 0.8540772532188842
+     Precision for (Non Hate): 0.6317991631799164
+     Recall: 0.6933797909407665
+     Recall for (Non Hate): 0.8162162162162162
+     F1 score: 0.7653846153846154
+     F1 score for (Non Hate): 0.7122641509433962
+     Accuracy: 0.7415254237288136
+
+The metrics for legendary-galaxy-224 run are:
+     Precision: 0.800711743772242
+     Precision for (Non Hate): 0.675392670157068
+     Recall: 0.7839721254355401
+     Recall for (Non Hate): 0.6972972972972973
+     F1 score: 0.7922535211267606
+     F1 score for (Non Hate): 0.6861702127659575
+     Accuracy: 0.75
+
+The metrics for olive-bush-212 run are:
+     Precision: 0.8666666666666667
+     Precision for (Non Hate): 0.6594827586206896
+     Recall: 0.7247386759581882
+     Recall for (Non Hate): 0.827027027027027
+     F1 score: 0.7893738140417457
+     F1 score for (Non Hate): 0.7338129496402879
+     Accuracy: 0.7648305084745762
+
+The metrics for ancient-cosmos-225 run are:
+     Precision: 0.8657407407407407
+     Precision for (Non Hate): 0.609375
+     Recall: 0.6515679442508711
+     Recall for (Non Hate): 0.8432432432432433
+     F1 score: 0.7435387673956262
+     F1 score for (Non Hate): 0.7074829931972789
+     Accuracy: 0.7266949152542372
+
+The metrics for whole-elevator-220 run are:
+     Precision: 0.8268398268398268
+     Precision for (Non Hate): 0.6016597510373444
+     Recall: 0.6655052264808362
+     Recall for (Non Hate): 0.7837837837837838
+     F1 score: 0.7374517374517374
+     F1 score for (Non Hate): 0.6807511737089201
+     Accuracy: 0.711864406779661

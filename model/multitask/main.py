@@ -118,6 +118,14 @@ def get_data_loaders(args, phase):
     dataloader = DataLoader(data, collate_fn=collate_fn, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers)
     return dataloader
 
+def load_weights(epoch, lf_model, comment_model, args):
+    lf_checkpoint = os.path.join(args.work_dir, 'lf_model_' + str(epoch)+'.pth.tar')
+    comment_checkpoint = os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar')
+    
+    lf_model.lf_model.load_state_dict(torch.load(lf_checkpoint)['state_dict'])
+    comment_model.load_state_dict(torch.load(comment_checkpoint)['state_dict'])
+    return 
+
 def train_one_epoch(train_loader, epoch, phase, device, criterions, optimizer, lf_model, comment_model, multitaskloss_instance, args):
     
     lf_model.lf_model.train()
@@ -229,13 +237,7 @@ def eval_one_epoch(test_loader, epoch, phase, device, criterions, lf_model, comm
     return losses.avg, acces.avg, preds, labels
 
 
-def load_weights(epoch, lf_model, comment_model, args):
-    lf_checkpoint = os.path.join(args.work_dir, 'lf_model_' + str(epoch)+'.pth.tar')
-    comment_checkpoint = os.path.join(args.work_dir, 'comment_model_' + str(epoch)+'.pth.tar')
-    
-    lf_model.lf_model.load_state_dict(torch.load(lf_checkpoint)['state_dict'])
-    comment_model.load_state_dict(torch.load(comment_checkpoint)['state_dict'])
-    return 
+
     
 def main():  
     args = get_params()

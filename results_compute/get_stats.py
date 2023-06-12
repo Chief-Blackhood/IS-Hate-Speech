@@ -2,7 +2,7 @@ from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_sc
 import os
 import numpy as np
 
-NPY_FILE_PATH = "../npy_files/7Jun_vision"
+NPY_FILE_PATH = "../npy_files/9Jun_vision"
 
 filenames = os.listdir(path=NPY_FILE_PATH)
 filenames = sorted(filenames, key=lambda x: x.split('_')[-1])
@@ -14,10 +14,14 @@ for filename in filenames:
     preds_data = np.load(f'{NPY_FILE_PATH}/test_preds_{filename}', allow_pickle=True)
     labels = []
     preds = []
+    # for i in range(len(labels_data)):
+    #     for j in range(len(labels_data[i])):
+    #         labels.append(labels_data[i][j][-1])
+    #         preds.append(preds_data[i][j][-1])
     for i in range(len(labels_data)):
-        for j in range(len(labels_data[i])):
-            labels.append(labels_data[i][j][-1])
-            preds.append(preds_data[i][j][-1])
+        for j in range(len(labels_data[i][0])):
+            labels.append(labels_data[i][0][j][0])
+            preds.append(preds_data[i][0][j][0])
     labels = np.array(labels)
     preds = np.array(preds)
     preds[preds >= 0.5] = 1
