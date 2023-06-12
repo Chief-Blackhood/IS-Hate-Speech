@@ -239,6 +239,8 @@ def load_weights(epoch, lf_model, comment_model, args):
     
 def main():  
     args = get_params()
+    print(args)
+    
     run = wandb.init(project="vision_models", entity='is_project')
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     device = "mps" if getattr(torch,'has_mps',False) else "cuda" if torch.cuda.is_available() else "cpu"
@@ -310,7 +312,13 @@ def main():
             'vpm_optimizer': optimizer.state_dict()
         }, args, run.name, os.path.join(args.work_dir, 'comment_model_' + '.pth.tar'), is_better)
         
-    #load_weights('best')
+    load_weights(run.name, lf_model, comment_model, args)
+
+    test_loss, test_acc, test_pred, test_label = eval_one_epoch(validation_loader, 0, 'Eval', device, criterions, lf_model, comment_model, multitaskloss_instance, args)
+    print('Eval: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
+    np.save(f'{args.work_dir}/eval_preds_{run.name}.npy', np.array(test_pred, dtype=object))
+    np.save(f'{args.work_dir}/eval_labels_{run.name}.npy', np.array(test_label, dtype=object))
+
     test_loss, test_acc, test_pred, test_label = eval_one_epoch(test_loader, 0, 'Test', device, criterions, lf_model, comment_model, multitaskloss_instance, args)
     print('Test: loss {:.4f}\taccu {:.4f}'.format(test_loss, test_acc))
     np.save(f'{args.work_dir}/test_preds_{run.name}.npy', np.array(test_pred, dtype=object))
