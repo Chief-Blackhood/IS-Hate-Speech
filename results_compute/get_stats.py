@@ -2,12 +2,12 @@ from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_sc
 import os
 import numpy as np
 
-NPY_FILE_PATH = "../npy_files/9Jun_vision"
+NPY_FILE_PATH = "../npy_files/13Jun2023_without_multitask"
 
 filenames = os.listdir(path=NPY_FILE_PATH)
 filenames = sorted(filenames, key=lambda x: x.split('_')[-1])
 filenames = list(set([filename.split('_')[2] for filename in filenames]))
-
+print(f'Number of runs {len(filenames)}')
 for filename in filenames:
     run_name = filename.split('.')[0]
     labels_data = np.load(f'{NPY_FILE_PATH}/test_labels_{filename}', allow_pickle=True)

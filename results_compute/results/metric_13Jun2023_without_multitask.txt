@@ -1,147 +1,13 @@
+Number of runs 27
 
-The metrics for easy-breeze-252 run are:
-     Precision: 0.8625954198473282
-     Precision for (Non Hate): 0.7095238095238096
-     Recall: 0.7874564459930313
-     Recall for (Non Hate): 0.8054054054054054
-     F1 score: 0.8233151183970856
-     F1 score for (Non Hate): 0.7544303797468355
-     Accuracy: 0.7944915254237288
-
-The metrics for fresh-jazz-256 run are:
-     Precision: 0.7701149425287356
-     Precision for (Non Hate): 0.5924170616113744
-     Recall: 0.7003484320557491
-     Recall for (Non Hate): 0.6756756756756757
-     F1 score: 0.7335766423357662
-     F1 score for (Non Hate): 0.6313131313131313
-     Accuracy: 0.690677966101695
-
-The metrics for distinctive-wood-259 run are:
-     Precision: 0.7084548104956269
-     Precision for (Non Hate): 0.6589147286821705
-     Recall: 0.8466898954703833
-     Recall for (Non Hate): 0.4594594594594595
-     F1 score: 0.7714285714285716
-     F1 score for (Non Hate): 0.5414012738853503
-     Accuracy: 0.6949152542372882
-
-The metrics for expert-rain-246 run are:
-     Precision: 0.8271604938271605
-     Precision for (Non Hate): 0.6244541484716157
-     Recall: 0.7003484320557491
+The metrics for charmed-durian-272 run are:
+     Precision: 0.8326693227091634
+     Precision for (Non Hate): 0.6470588235294118
+     Recall: 0.7282229965156795
      Recall for (Non Hate): 0.772972972972973
-     F1 score: 0.758490566037736
-     F1 score for (Non Hate): 0.6908212560386474
-     Accuracy: 0.7288135593220338
-
-The metrics for flowing-waterfall-256 run are:
-     Precision: 0.7785016286644951
-     Precision for (Non Hate): 0.7090909090909091
-     Recall: 0.8327526132404182
-     Recall for (Non Hate): 0.6324324324324324
-     F1 score: 0.8047138047138047
-     F1 score for (Non Hate): 0.6685714285714285
-     Accuracy: 0.7542372881355932
-
-The metrics for worthy-firefly-260 run are:
-     Precision: 0.8693693693693694
-     Precision for (Non Hate): 0.624
-     Recall: 0.6724738675958188
-     Recall for (Non Hate): 0.8432432432432433
-     F1 score: 0.7583497053045186
-     F1 score for (Non Hate): 0.7172413793103449
-     Accuracy: 0.739406779661017
-
-The metrics for playful-jazz-265 run are:
-     Precision: 0.7540983606557377
-     Precision for (Non Hate): 0.5482456140350878
-     Recall: 0.6411149825783972
-     Recall for (Non Hate): 0.6756756756756757
-     F1 score: 0.6930320150659133
-     F1 score for (Non Hate): 0.6053268765133172
-     Accuracy: 0.6546610169491526
-
-The metrics for ruby-firefly-262 run are:
-     Precision: 0.7916666666666666
-     Precision for (Non Hate): 0.6793478260869565
-     Recall: 0.794425087108014
-     Recall for (Non Hate): 0.6756756756756757
-     F1 score: 0.7930434782608695
-     F1 score for (Non Hate): 0.6775067750677507
-     Accuracy: 0.7478813559322034
-
-The metrics for swift-haze-246 run are:
-     Precision: 0.6869300911854104
-     Precision for (Non Hate): 0.5734265734265734
-     Recall: 0.7874564459930313
-     Recall for (Non Hate): 0.44324324324324327
-     F1 score: 0.7337662337662337
-     F1 score for (Non Hate): 0.5
-     Accuracy: 0.652542372881356
-
-The metrics for upbeat-shape-249 run are:
-     Precision: 0.7949790794979079
-     Precision for (Non Hate): 0.5836909871244635
-     Recall: 0.662020905923345
-     Recall for (Non Hate): 0.7351351351351352
-     F1 score: 0.7224334600760457
-     F1 score for (Non Hate): 0.6507177033492824
-     Accuracy: 0.690677966101695
-
-The metrics for gallant-breeze-263 run are:
-     Precision: 0.7868852459016393
-     Precision for (Non Hate): 0.718562874251497
-     Recall: 0.8362369337979094
-     Recall for (Non Hate): 0.6486486486486487
-     F1 score: 0.8108108108108109
-     F1 score for (Non Hate): 0.6818181818181819
-     Accuracy: 0.7627118644067796
-
-The metrics for driven-wildflower-253 run are:
-     Precision: 0.8352490421455939
-     Precision for (Non Hate): 0.6729857819905213
-     Recall: 0.759581881533101
-     Recall for (Non Hate): 0.7675675675675676
-     F1 score: 0.7956204379562045
-     F1 score for (Non Hate): 0.7171717171717171
-     Accuracy: 0.7627118644067796
-
-The metrics for toasty-disco-254 run are:
-     Precision: 0.7956204379562044
-     Precision for (Non Hate): 0.6515151515151515
-     Recall: 0.759581881533101
-     Recall for (Non Hate): 0.6972972972972973
-     F1 score: 0.7771836007130125
-     F1 score for (Non Hate): 0.6736292428198434
-     Accuracy: 0.7351694915254238
-
-The metrics for devout-blaze-255 run are:
-     Precision: 0.9090909090909091
-     Precision for (Non Hate): 0.6311787072243346
-     Recall: 0.662020905923345
-     Recall for (Non Hate): 0.8972972972972973
-     F1 score: 0.7661290322580645
-     F1 score for (Non Hate): 0.7410714285714286
-     Accuracy: 0.7542372881355932
-
-The metrics for pious-flower-245 run are:
-     Precision: 0.8297872340425532
-     Precision for (Non Hate): 0.7210526315789474
-     Recall: 0.8153310104529616
-     Recall for (Non Hate): 0.7405405405405405
-     F1 score: 0.8224956063268892
-     F1 score for (Non Hate): 0.7306666666666667
-     Accuracy: 0.7860169491525424
-
-The metrics for fallen-yogurt-260 run are:
-     Precision: 0.6080508474576272
-     Precision for (Non Hate): 0.0
-     Recall: 1.0
-     Recall for (Non Hate): 0.0
-     F1 score: 0.7562582345191041
-     F1 score for (Non Hate): 0.0
-     Accuracy: 0.6080508474576272
+     F1 score: 0.7769516728624535
+     F1 score for (Non Hate): 0.7044334975369458
+     Accuracy: 0.7457627118644068
 
 The metrics for eager-tree-265 run are:
      Precision: 0.7699386503067485
@@ -152,23 +18,32 @@ The metrics for eager-tree-265 run are:
      F1 score for (Non Hate): 0.6646525679758308
      Accuracy: 0.7648305084745762
 
-The metrics for pious-puddle-249 run are:
-     Precision: 0.7445482866043613
-     Precision for (Non Hate): 0.6821192052980133
-     Recall: 0.8327526132404182
-     Recall for (Non Hate): 0.5567567567567567
-     F1 score: 0.7861842105263157
-     F1 score for (Non Hate): 0.6130952380952381
-     Accuracy: 0.7245762711864406
+The metrics for upbeat-shape-249 run are:
+     Precision: 0.7949790794979079
+     Precision for (Non Hate): 0.5836909871244635
+     Recall: 0.662020905923345
+     Recall for (Non Hate): 0.7351351351351352
+     F1 score: 0.7224334600760457
+     F1 score for (Non Hate): 0.6507177033492824
+     Accuracy: 0.690677966101695
 
-The metrics for desert-star-249 run are:
-     Precision: 0.8008298755186722
-     Precision for (Non Hate): 0.5930735930735931
-     Recall: 0.6724738675958188
-     Recall for (Non Hate): 0.7405405405405405
-     F1 score: 0.7310606060606061
-     F1 score for (Non Hate): 0.6586538461538461
-     Accuracy: 0.6991525423728814
+The metrics for swift-haze-246 run are:
+     Precision: 0.6869300911854104
+     Precision for (Non Hate): 0.5734265734265734
+     Recall: 0.7874564459930313
+     Recall for (Non Hate): 0.44324324324324327
+     F1 score: 0.7337662337662337
+     F1 score for (Non Hate): 0.5
+     Accuracy: 0.652542372881356
+
+The metrics for vital-universe-262 run are:
+     Precision: 0.7206703910614525
+     Precision for (Non Hate): 0.7456140350877193
+     Recall: 0.8989547038327527
+     Recall for (Non Hate): 0.4594594594594595
+     F1 score: 0.8
+     F1 score for (Non Hate): 0.568561872909699
+     Accuracy: 0.7266949152542372
 
 The metrics for morning-waterfall-256 run are:
      Precision: 0.8072727272727273
@@ -178,24 +53,6 @@ The metrics for morning-waterfall-256 run are:
      F1 score: 0.7900355871886121
      F1 score for (Non Hate): 0.6910994764397906
      Accuracy: 0.75
-
-The metrics for quiet-snowflake-265 run are:
-     Precision: 0.7285223367697594
-     Precision for (Non Hate): 0.585635359116022
-     Recall: 0.7386759581881533
-     Recall for (Non Hate): 0.572972972972973
-     F1 score: 0.7335640138408305
-     F1 score for (Non Hate): 0.5792349726775956
-     Accuracy: 0.673728813559322
-
-The metrics for charmed-durian-272 run are:
-     Precision: 0.8326693227091634
-     Precision for (Non Hate): 0.6470588235294118
-     Recall: 0.7282229965156795
-     Recall for (Non Hate): 0.772972972972973
-     F1 score: 0.7769516728624535
-     F1 score for (Non Hate): 0.7044334975369458
-     Accuracy: 0.7457627118644068
 
 The metrics for olive-shape-262 run are:
      Precision: 0.7656765676567657
@@ -215,6 +72,51 @@ The metrics for twilight-snowflake-263 run are:
      F1 score for (Non Hate): 0.638961038961039
      Accuracy: 0.7055084745762712
 
+The metrics for toasty-disco-254 run are:
+     Precision: 0.7956204379562044
+     Precision for (Non Hate): 0.6515151515151515
+     Recall: 0.759581881533101
+     Recall for (Non Hate): 0.6972972972972973
+     F1 score: 0.7771836007130125
+     F1 score for (Non Hate): 0.6736292428198434
+     Accuracy: 0.7351694915254238
+
+The metrics for fresh-jazz-256 run are:
+     Precision: 0.7701149425287356
+     Precision for (Non Hate): 0.5924170616113744
+     Recall: 0.7003484320557491
+     Recall for (Non Hate): 0.6756756756756757
+     F1 score: 0.7335766423357662
+     F1 score for (Non Hate): 0.6313131313131313
+     Accuracy: 0.690677966101695
+
+The metrics for desert-star-249 run are:
+     Precision: 0.8008298755186722
+     Precision for (Non Hate): 0.5930735930735931
+     Recall: 0.6724738675958188
+     Recall for (Non Hate): 0.7405405405405405
+     F1 score: 0.7310606060606061
+     F1 score for (Non Hate): 0.6586538461538461
+     Accuracy: 0.6991525423728814
+
+The metrics for flowing-waterfall-256 run are:
+     Precision: 0.7785016286644951
+     Precision for (Non Hate): 0.7090909090909091
+     Recall: 0.8327526132404182
+     Recall for (Non Hate): 0.6324324324324324
+     F1 score: 0.8047138047138047
+     F1 score for (Non Hate): 0.6685714285714285
+     Accuracy: 0.7542372881355932
+
+The metrics for quiet-snowflake-265 run are:
+     Precision: 0.7285223367697594
+     Precision for (Non Hate): 0.585635359116022
+     Recall: 0.7386759581881533
+     Recall for (Non Hate): 0.572972972972973
+     F1 score: 0.7335640138408305
+     F1 score for (Non Hate): 0.5792349726775956
+     Accuracy: 0.673728813559322
+
 The metrics for fanciful-puddle-265 run are:
      Precision: 0.8654708520179372
      Precision for (Non Hate): 0.6224899598393574
@@ -223,6 +125,60 @@ The metrics for fanciful-puddle-265 run are:
      F1 score: 0.7568627450980391
      F1 score for (Non Hate): 0.7142857142857142
      Accuracy: 0.7372881355932204
+
+The metrics for playful-jazz-265 run are:
+     Precision: 0.7540983606557377
+     Precision for (Non Hate): 0.5482456140350878
+     Recall: 0.6411149825783972
+     Recall for (Non Hate): 0.6756756756756757
+     F1 score: 0.6930320150659133
+     F1 score for (Non Hate): 0.6053268765133172
+     Accuracy: 0.6546610169491526
+
+The metrics for worthy-firefly-260 run are:
+     Precision: 0.8693693693693694
+     Precision for (Non Hate): 0.624
+     Recall: 0.6724738675958188
+     Recall for (Non Hate): 0.8432432432432433
+     F1 score: 0.7583497053045186
+     F1 score for (Non Hate): 0.7172413793103449
+     Accuracy: 0.739406779661017
+
+The metrics for pious-flower-245 run are:
+     Precision: 0.8297872340425532
+     Precision for (Non Hate): 0.7210526315789474
+     Recall: 0.8153310104529616
+     Recall for (Non Hate): 0.7405405405405405
+     F1 score: 0.8224956063268892
+     F1 score for (Non Hate): 0.7306666666666667
+     Accuracy: 0.7860169491525424
+
+The metrics for pious-puddle-249 run are:
+     Precision: 0.7445482866043613
+     Precision for (Non Hate): 0.6821192052980133
+     Recall: 0.8327526132404182
+     Recall for (Non Hate): 0.5567567567567567
+     F1 score: 0.7861842105263157
+     F1 score for (Non Hate): 0.6130952380952381
+     Accuracy: 0.7245762711864406
+
+The metrics for distinctive-wood-259 run are:
+     Precision: 0.7084548104956269
+     Precision for (Non Hate): 0.6589147286821705
+     Recall: 0.8466898954703833
+     Recall for (Non Hate): 0.4594594594594595
+     F1 score: 0.7714285714285716
+     F1 score for (Non Hate): 0.5414012738853503
+     Accuracy: 0.6949152542372882
+
+The metrics for fallen-yogurt-260 run are:
+     Precision: 0.6080508474576272
+     Precision for (Non Hate): 0.0
+     Recall: 1.0
+     Recall for (Non Hate): 0.0
+     F1 score: 0.7562582345191041
+     F1 score for (Non Hate): 0.0
+     Accuracy: 0.6080508474576272
 
 The metrics for radiant-night-265 run are:
      Precision: 0.8617886178861789
@@ -233,11 +189,56 @@ The metrics for radiant-night-265 run are:
      F1 score for (Non Hate): 0.7347931873479318
      Accuracy: 0.7690677966101694
 
-The metrics for vital-universe-262 run are:
-     Precision: 0.7206703910614525
-     Precision for (Non Hate): 0.7456140350877193
-     Recall: 0.8989547038327527
-     Recall for (Non Hate): 0.4594594594594595
-     F1 score: 0.8
-     F1 score for (Non Hate): 0.568561872909699
-     Accuracy: 0.7266949152542372
+The metrics for driven-wildflower-253 run are:
+     Precision: 0.8352490421455939
+     Precision for (Non Hate): 0.6729857819905213
+     Recall: 0.759581881533101
+     Recall for (Non Hate): 0.7675675675675676
+     F1 score: 0.7956204379562045
+     F1 score for (Non Hate): 0.7171717171717171
+     Accuracy: 0.7627118644067796
+
+The metrics for gallant-breeze-263 run are:
+     Precision: 0.7868852459016393
+     Precision for (Non Hate): 0.718562874251497
+     Recall: 0.8362369337979094
+     Recall for (Non Hate): 0.6486486486486487
+     F1 score: 0.8108108108108109
+     F1 score for (Non Hate): 0.6818181818181819
+     Accuracy: 0.7627118644067796
+
+The metrics for ruby-firefly-262 run are:
+     Precision: 0.7916666666666666
+     Precision for (Non Hate): 0.6793478260869565
+     Recall: 0.794425087108014
+     Recall for (Non Hate): 0.6756756756756757
+     F1 score: 0.7930434782608695
+     F1 score for (Non Hate): 0.6775067750677507
+     Accuracy: 0.7478813559322034
+
+The metrics for easy-breeze-252 run are:
+     Precision: 0.8625954198473282
+     Precision for (Non Hate): 0.7095238095238096
+     Recall: 0.7874564459930313
+     Recall for (Non Hate): 0.8054054054054054
+     F1 score: 0.8233151183970856
+     F1 score for (Non Hate): 0.7544303797468355
+     Accuracy: 0.7944915254237288
+
+The metrics for expert-rain-246 run are:
+     Precision: 0.8271604938271605
+     Precision for (Non Hate): 0.6244541484716157
+     Recall: 0.7003484320557491
+     Recall for (Non Hate): 0.772972972972973
+     F1 score: 0.758490566037736
+     F1 score for (Non Hate): 0.6908212560386474
+     Accuracy: 0.7288135593220338
+
+The metrics for devout-blaze-255 run are:
+     Precision: 0.9090909090909091
+     Precision for (Non Hate): 0.6311787072243346
+     Recall: 0.662020905923345
+     Recall for (Non Hate): 0.8972972972972973
+     F1 score: 0.7661290322580645
+     F1 score for (Non Hate): 0.7410714285714286
+     Accuracy: 0.7542372881355932
