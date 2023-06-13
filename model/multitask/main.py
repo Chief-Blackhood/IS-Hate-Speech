@@ -267,7 +267,7 @@ def main():
     
     total = 210 + 243 + 1128 + 1002
     pos_weight = torch.tensor([(total - 210)/210, (total - 243)/243, (total - 1128)/1128, (total - 1002)/1002])
-    if args.remove_none:
+    if not args.remove_none:
         total += 3065
         pos_weight = torch.tensor([(total - 210)/210, (total - 243)/243, (total - 1128)/1128, (total - 1002)/1002, (total - 3065)/3065])
     criterions = [nn.BCEWithLogitsLoss(pos_weight=pos_weight).to(device), nn.BCELoss().to(device)]
